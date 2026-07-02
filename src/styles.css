@@ -1,0 +1,387 @@
+:root {
+  --base: #f6f5f2;
+  --base-card: #ffffff;
+  --secondary: #23262b;
+  --secondary-soft: #383c42;
+  --accent: #2e7d5b;
+  --accent-dark: #235f46;
+  --accent-soft: #e4f0ea;
+
+  --text-dark: #23262b;
+  --text-light: #f6f5f2;
+  --text-muted: #6b7075;
+  --text-muted-light: #a9adb1;
+  --border: #e2e0da;
+  --border-dark: rgba(246, 245, 242, 0.14);
+
+  --shadow-soft: 0 6px 24px rgba(35, 38, 43, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--base);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Zilla Slab', serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ===== ШАПКА ===== */
+.site-header {
+  background: var(--secondary);
+  color: var(--text-light);
+  padding: 20px 32px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.logo {
+  font-family: 'Zilla Slab', serif;
+  font-size: 21px;
+  font-weight: 700;
+}
+.logo span {
+  color: var(--accent);
+}
+.site-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted-light);
+}
+
+/* ===== СЕКЦИИ ===== */
+.section {
+  padding: 40px 32px 72px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: block;
+}
+.section-title {
+  font-size: clamp(24px, 3vw, 34px);
+  margin-bottom: 8px;
+}
+.section-desc {
+  color: var(--text-muted);
+  max-width: 640px;
+  margin-bottom: 24px;
+  font-size: 15px;
+}
+
+/* ===== ФИЛЬТРЫ ===== */
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+.search-input,
+.filters-row select {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background: var(--base-card);
+  color: var(--text-dark);
+}
+.search-input {
+  flex: 1;
+  min-width: 220px;
+}
+.search-input:focus,
+.filters-row select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ===== СТАТУСЫ ===== */
+.status-text {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.status-error {
+  color: #a23b3b;
+}
+
+/* ===== КНОПКИ ===== */
+.btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+.btn-ghost:hover {
+  color: var(--accent-dark);
+}
+
+/* ===== СЕТКА КАРТОЧЕК ===== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.facet-card {
+  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+}
+.specimen-card {
+  background: var(--secondary);
+  color: var(--text-light);
+  box-shadow: var(--shadow-soft);
+  display: block;
+  cursor: pointer;
+}
+.specimen-photo {
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--secondary-soft);
+}
+.specimen-body {
+  padding: 18px 20px 20px;
+}
+.specimen-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.specimen-name {
+  font-family: 'Zilla Slab', serif;
+  font-size: 19px;
+  font-weight: 600;
+}
+.specimen-latin {
+  font-size: 12px;
+  color: var(--text-muted-light);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border-dark);
+  color: var(--text-muted-light);
+}
+.data-row span.value {
+  color: var(--text-light);
+  font-family: 'IBM Plex Mono', monospace;
+  text-align: right;
+}
+.stock-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== ПАГИНАЦИЯ ===== */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 36px;
+}
+.page-info {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ===== ЧИПЫ ===== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.chip-active {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ===== СТРАНИЦА МИНЕРАЛА ===== */
+.mineral-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding-top: 4px;
+}
+.mineral-hero-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+.hero-visual {
+  background: var(--secondary);
+  color: var(--text-light);
+  border: 1px solid var(--border-dark);
+  padding: 20px 22px;
+  clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 34px, 100% 100%, 0 100%);
+}
+.mineral-data-card {
+  margin-bottom: 8px;
+}
+.mineral-block {
+  background: var(--base-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 22px 24px;
+  margin-top: 20px;
+}
+.mineral-block h3 {
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+.mineral-block p {
+  font-size: 14.5px;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+}
+.esoteric-block {
+  border-color: #d9a441;
+  background: #fbf7ec;
+}
+.locality-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.locality-list li {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+.locality-list li:first-child {
+  border-top: none;
+}
+.locality-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.gallery-grid img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.safety-note {
+  border-color: #a23b3b;
+  background: #f8e9e9;
+}
+
+@media (max-width: 900px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
