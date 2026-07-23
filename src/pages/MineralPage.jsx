@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getMineral } from '../api.js';
+import Lightbox from '../components/Lightbox.jsx';
 
 export default function MineralPage() {
   const { slug } = useParams();
@@ -8,6 +9,7 @@ export default function MineralPage() {
   const [mineral, setMineral] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -200,10 +202,29 @@ export default function MineralPage() {
           <h3>Галерея</h3>
           <div className="gallery-grid">
             {gallery.map((g, i) => (
-              <img key={i} src={g.url} alt={g.description_ru || ru.name} />
+              <button
+                key={i}
+                type="button"
+                className="gallery-thumb"
+                onClick={() => setLightboxIndex(i)}
+                aria-label="Открыть фото крупно"
+              >
+                <img src={g.url} alt={g.description_ru || ru.name} />
+                <span className="gallery-thumb-zoom">🔍</span>
+              </button>
             ))}
           </div>
         </div>
+      )}
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={gallery}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onPrev={() => setLightboxIndex((i) => (i - 1 + gallery.length) % gallery.length)}
+          onNext={() => setLightboxIndex((i) => (i + 1) % gallery.length)}
+        />
       )}
 
       {safety_notes && (

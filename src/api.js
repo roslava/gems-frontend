@@ -43,3 +43,17 @@ export function searchMinerals(q, { lang = 'ru' } = {}) {
 export function getFilters() {
   return request('/filters');
 }
+
+// === Статьи (posts) ===
+
+export function getPosts({ lang = 'ru', page = 1, limit = 20, ...filters } = {}) {
+  return request('/posts', { lang, page, limit, published: true, ...filters });
+}
+
+export function getPost(slug, { lang = 'ru' } = {}) {
+  return request(`/posts/${slug}`, { lang });
+}
+
+export function searchPosts(q, { lang = 'ru', limit = 20 } = {}) {
+  return request('/search/posts', { q, lang, limit });
+}
