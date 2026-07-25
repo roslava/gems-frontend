@@ -3,8 +3,34 @@ import CatalogPage from './pages/CatalogPage.jsx';
 import MineralPage from './pages/MineralPage.jsx';
 import ArticlesPage from './pages/ArticlesPage.jsx';
 import ArticlePage from './pages/ArticlePage.jsx';
+import { useLang } from './i18n/LangContext.jsx';
+
+function LangSwitcher() {
+  const { lang, setLang } = useLang();
+  return (
+    <div className="lang-switch" role="group" aria-label="Language">
+      <button
+        type="button"
+        className={lang === 'ru' ? 'active' : undefined}
+        onClick={() => setLang('ru')}
+        disabled={lang === 'ru'}
+      >
+        RU
+      </button>
+      <button
+        type="button"
+        className={lang === 'en' ? 'active' : undefined}
+        onClick={() => setLang('en')}
+        disabled={lang === 'en'}
+      >
+        EN
+      </button>
+    </div>
+  );
+}
 
 export default function App() {
+  const { t } = useLang();
   return (
     <div className="app">
       <header className="site-header">
@@ -13,13 +39,16 @@ export default function App() {
         </Link>
         <nav className="site-nav">
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : undefined)}>
-            Каталог
+            {t('nav_catalog')}
           </NavLink>
           <NavLink to="/articles" className={({ isActive }) => (isActive ? 'active' : undefined)}>
-            Статьи
+            {t('nav_articles')}
           </NavLink>
         </nav>
-        <span className="site-tag">тестовая витрина · данные из API</span>
+        <div className="site-header-right">
+          <span className="site-tag">{t('site_tag')}</span>
+          <LangSwitcher />
+        </div>
       </header>
       <main>
         <Routes>

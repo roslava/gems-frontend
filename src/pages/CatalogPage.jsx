@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getMinerals, searchMinerals } from '../api.js';
 import SpecimenCard from '../components/SpecimenCard.jsx';
-
-const RARITIES = [
-  { value: '', label: 'Любая редкость' },
-  { value: 'common', label: 'Обычный' },
-  { value: 'uncommon', label: 'Нечастый' },
-  { value: 'rare', label: 'Редкий' },
-  { value: 'very_rare', label: 'Очень редкий' },
-];
+import { useLang } from '../i18n/LangContext.jsx';
 
 export default function CatalogPage() {
+  const { lang, t } = useLang();
   const [minerals, setMinerals] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -21,6 +15,14 @@ export default function CatalogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const RARITIES = [
+    { value: '', label: t('rarity_any') },
+    { value: 'common', label: t('rarity_common') },
+    { value: 'uncommon', label: t('rarity_uncommon') },
+    { value: 'rare', label: t('rarity_rare') },
+    { value: 'very_rare', label: t('rarity_very_rare') },
+  ];
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -30,9 +32,10 @@ export default function CatalogPage() {
       try {
         let result;
         if (query.trim()) {
-          result = await searchMinerals(query.trim());
+          result = await searchMinerals(query.trim(), { lang });
         } else {
           result = await getMinerals({
+            lang,
             page,
             limit,
             rarity: rarity || undefined,
@@ -54,23 +57,21 @@ export default function CatalogPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, rarity, russianOnly, query]);
+  }, [page, limit, rarity, russianOnly, query, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
     <div className="section">
-      <span className="section-label">Каталог</span>
-      <h1 className="section-title">Образцы в базе</h1>
-      <p className="section-desc">
-        Рабочая витрина для проверки наполнения — тянет данные напрямую из Samotsvety API.
-      </p>
+      <span className="section-label">{t('nav_catalog')}</span>
+      <h1 className="section-title">{t('catalog_title')}</h1>
+      <p className="section-desc">{t('catalog_desc')}</p>
 
       <div className="filters-row">
         <input
           className="search-input"
           type="text"
-          placeholder="Поиск по названию, формуле, lore…"
+          placeholder={t('search_placeholder')}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -99,18 +100,18 @@ export default function CatalogPage() {
               setPage(1);
             }}
           />
-          Только российские месторождения
+          {t('russian_only')}
         </label>
       </div>
 
-      {loading && <p className="status-text">Загрузка…</p>}
+      {loading && <p className="status-text">{t('loading')}</p>}
       {error && (
         <p className="status-text status-error">
-          Не удалось получить данные: {error}
+          {t('error_prefix')} {error}
         </p>
       )}
       {!loading && !error && minerals.length === 0 && (
-        <p className="status-text">Ничего не найдено — база пуста или фильтр слишком строгий.</p>
+        <p className="status-text">{t('empty')}</p>
       )}
 
       <div className="cards-grid">
@@ -122,17 +123,15 @@ export default function CatalogPage() {
       {!query && totalPages > 1 && (
         <div className="pagination">
           <button className="btn btn-outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            ← Назад
+            {t('prev_page')}
           </button>
-          <span className="page-info">
-            Стр. {page} из {totalPages}
-          </span>
+          <span className="page-info">{t('page_info', page, totalPages)}</span>
           <button
             className="btn btn-outline"
             disabled={page >= totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
-            Вперёд →
+            {t('next_page')}
           </button>
         </div>
       )}

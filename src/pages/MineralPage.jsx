@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getMineral } from '../api.js';
 import Lightbox from '../components/Lightbox.jsx';
+import { useLang, pickI18n, pickField } from '../i18n/LangContext.jsx';
 
 export default function MineralPage() {
   const { slug } = useParams();
+  const { lang, t } = useLang();
   const [view, setView] = useState('normal');
   const [mineral, setMineral] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ export default function MineralPage() {
     setLoading(true);
     setError(null);
 
-    getMineral(slug, { view })
+    getMineral(slug, { view, lang })
       .then((data) => {
         if (!cancelled) setMineral(data);
       })
@@ -30,12 +32,12 @@ export default function MineralPage() {
     return () => {
       cancelled = true;
     };
-  }, [slug, view]);
+  }, [slug, view, lang]);
 
   if (loading) {
     return (
       <div className="section">
-        <p className="status-text">Загрузка…</p>
+        <p className="status-text">{t('loading')}</p>
       </div>
     );
   }
@@ -43,9 +45,11 @@ export default function MineralPage() {
   if (error) {
     return (
       <div className="section">
-        <p className="status-text status-error">Не удалось загрузить образец: {error}</p>
+        <p className="status-text status-error">
+          {t('mineral_load_error')} {error}
+        </p>
         <Link className="btn btn-outline" to="/">
-          ← К каталогу
+          {t('back_to_catalog')}
         </Link>
       </div>
     );
@@ -62,21 +66,23 @@ export default function MineralPage() {
     safety_notes,
     related_minerals = [],
   } = mineral;
-  const ru = i18n.ru || {};
-  const esoteric = ru.esoteric;
+  const data = pickI18n(i18n, lang);
+  const esoteric = data.esoteric;
 
   return (
     <div className="section mineral-page">
       <Link className="btn btn-ghost" to="/">
-        ← К каталогу
+        {t('back_to_catalog')}
       </Link>
 
       <div className="mineral-header">
         <div>
           <span className="section-label">{scientific.mineral_group}</span>
-          <h1 className="section-title">{ru.name}</h1>
-          {ru.synonyms?.length > 0 && (
-            <p className="section-desc">Также известен как: {ru.synonyms.join(', ')}</p>
+          <h1 className="section-title">{data.name}</h1>
+          {data.synonyms?.length > 0 && (
+            <p className="section-desc">
+              {t('synonyms_prefix')} {data.synonyms.join(', ')}
+            </p>
           )}
         </div>
         <label className="view-toggle">
@@ -85,87 +91,87 @@ export default function MineralPage() {
             checked={view === 'esoteric'}
             onChange={(e) => setView(e.target.checked ? 'esoteric' : 'normal')}
           />
-          С эзотерикой
+          {t('esoteric_toggle')}
         </label>
       </div>
 
-      {main_image_url && <img className="mineral-hero-image" src={main_image_url} alt={ru.name} />}
+      {main_image_url && <img className="mineral-hero-image" src={main_image_url} alt={data.name} />}
 
       <div className="hero-visual mineral-data-card">
         <div className="data-row" style={{ borderTop: 'none' }}>
-          <span>Формула</span>
+          <span>{t('formula')}</span>
           <span className="value">{scientific.chemical_formula}</span>
         </div>
         <div className="data-row">
-          <span>Группа</span>
+          <span>{t('group')}</span>
           <span className="value">{scientific.mineral_group}</span>
         </div>
         <div className="data-row">
-          <span>Кристаллическая система</span>
+          <span>{t('crystal_system')}</span>
           <span className="value">{scientific.crystal_system}</span>
         </div>
         <div className="data-row">
-          <span>Твёрдость</span>
+          <span>{t('hardness')}</span>
           <span className="value">
             {scientific.hardness?.min}–{scientific.hardness?.max}
           </span>
         </div>
         <div className="data-row">
-          <span>Плотность</span>
+          <span>{t('density')}</span>
           <span className="value">
             {scientific.specific_gravity?.min}–{scientific.specific_gravity?.max} г/см³
           </span>
         </div>
         <div className="data-row">
-          <span>Блеск</span>
+          <span>{t('luster')}</span>
           <span className="value">{scientific.luster}</span>
         </div>
         <div className="data-row">
-          <span>Прозрачность</span>
+          <span>{t('transparency')}</span>
           <span className="value">{scientific.transparency}</span>
         </div>
         <div className="data-row">
-          <span>Цвет черты</span>
+          <span>{t('streak')}</span>
           <span className="value">{scientific.streak}</span>
         </div>
         {scientific.rarity && (
           <div className="data-row">
-            <span>Редкость</span>
-            <span className="value">{scientific.rarity}</span>
+            <span>{t('rarity')}</span>
+            <span className="value">{t(`rarity_${scientific.rarity}`)}</span>
           </div>
         )}
       </div>
 
-      {ru.color_description && (
+      {data.color_description && (
         <div className="mineral-block">
-          <h3>Цвет</h3>
-          <p>{ru.color_description}</p>
+          <h3>{t('color_title')}</h3>
+          <p>{data.color_description}</p>
         </div>
       )}
 
-      {ru.lore && (
+      {data.lore && (
         <div className="mineral-block">
-          <h3>История и культура</h3>
-          <p>{ru.lore}</p>
+          <h3>{t('lore_title')}</h3>
+          <p>{data.lore}</p>
         </div>
       )}
 
       {esoteric && (
         <div className="mineral-block esoteric-block">
-          <h3>Эзотерика</h3>
+          <h3>{t('esoteric_title')}</h3>
           {esoteric.metaphysical_properties?.length > 0 && (
             <p>
-              <strong>Свойства:</strong> {esoteric.metaphysical_properties.join(', ')}
+              <strong>{t('esoteric_properties')}</strong> {esoteric.metaphysical_properties.join(', ')}
             </p>
           )}
           {esoteric.chakras?.length > 0 && (
             <p>
-              <strong>Чакры:</strong> {esoteric.chakras.join(', ')}
+              <strong>{t('esoteric_chakras')}</strong> {esoteric.chakras.join(', ')}
             </p>
           )}
           {esoteric.zodiac?.length > 0 && (
             <p>
-              <strong>Знаки зодиака:</strong> {esoteric.zodiac.join(', ')}
+              <strong>{t('esoteric_zodiac')}</strong> {esoteric.zodiac.join(', ')}
             </p>
           )}
           {esoteric.healing_interpretation && <p>{esoteric.healing_interpretation}</p>}
@@ -176,30 +182,33 @@ export default function MineralPage() {
 
       {localities.length > 0 && (
         <div className="mineral-block">
-          <h3>Месторождения</h3>
+          <h3>{t('localities_title')}</h3>
           <ul className="locality-list">
-            {localities.map((loc, i) => (
-              <li key={i}>
-                <strong>
-                  {loc.country}
-                  {loc.region ? `, ${loc.region}` : ''}
-                </strong>
-                {loc.locality ? ` — ${loc.locality}` : ''}
-                {loc.is_russian && (
-                  <span className="chip chip-active" style={{ marginLeft: 8 }}>
-                    РФ
-                  </span>
-                )}
-                {loc.description_ru && <p className="locality-desc">{loc.description_ru}</p>}
-              </li>
-            ))}
+            {localities.map((loc, i) => {
+              const desc = pickField(loc, 'description', lang);
+              return (
+                <li key={i}>
+                  <strong>
+                    {loc.country}
+                    {loc.region ? `, ${loc.region}` : ''}
+                  </strong>
+                  {loc.locality ? ` — ${loc.locality}` : ''}
+                  {loc.is_russian && (
+                    <span className="chip chip-active" style={{ marginLeft: 8 }}>
+                      {t('russia_badge')}
+                    </span>
+                  )}
+                  {desc && <p className="locality-desc">{desc}</p>}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
 
       {gallery.length > 0 && (
         <div className="mineral-block">
-          <h3>Галерея</h3>
+          <h3>{t('gallery_title')}</h3>
           <div className="gallery-grid">
             {gallery.map((g, i) => (
               <button
@@ -207,9 +216,9 @@ export default function MineralPage() {
                 type="button"
                 className="gallery-thumb"
                 onClick={() => setLightboxIndex(i)}
-                aria-label="Открыть фото крупно"
+                aria-label={t('gallery_open_alt')}
               >
-                <img src={g.url} alt={g.description_ru || ru.name} />
+                <img src={g.url} alt={pickField(g, 'description', lang) || data.name} />
                 <span className="gallery-thumb-zoom">🔍</span>
               </button>
             ))}
@@ -229,14 +238,14 @@ export default function MineralPage() {
 
       {safety_notes && (
         <div className="mineral-block safety-note">
-          <h3>Меры предосторожности</h3>
+          <h3>{t('safety_title')}</h3>
           <p>{safety_notes}</p>
         </div>
       )}
 
       {related_minerals.length > 0 && (
         <div className="mineral-block">
-          <h3>Похожие минералы</h3>
+          <h3>{t('related_title')}</h3>
           <div className="row">
             {related_minerals.map((relSlug) => (
               <Link key={relSlug} to={`/minerals/${relSlug}`} className="chip chip-active">

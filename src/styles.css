@@ -630,3 +630,16 @@ a {
     gap: 4px;
   }
 }
+
+.site-header-right { display: flex; align-items: center; gap: 16px; }
+.lang-switch { display: flex; gap: 2px; }
+.lang-switch button {
+  border: 1px solid var(--border, #E2E0DA);
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+}
+.lang-switch button.active { background: var(--accent, #2E7D5B); color: #fff; border-color: var(--accent, #2E7D5B); }
+.lang-switch button:disabled { cursor: default; }
