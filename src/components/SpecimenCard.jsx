@@ -15,12 +15,13 @@ export default function SpecimenCard({ mineral }) {
 
   return (
     <Link to={`/minerals/${slug}`} className="specimen-card facet-card">
-      <div
-        className="specimen-photo"
-        style={image ? { backgroundImage: `url(${image})` } : undefined}
-      >
-        {!image && t('no_photo')}
-      </div>
+<div className="specimen-photo">
+  {image ? (
+    <div className="specimen-photo-img" style={{ backgroundImage: `url(${image})` }} />
+  ) : (
+    t('no_photo')
+  )}
+</div>
       <div className="specimen-body">
         <div className="specimen-name-row">
           <div className="specimen-name">{data?.name || slug}</div>

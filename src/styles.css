@@ -212,19 +212,25 @@ a {
 .specimen-photo {
   aspect-ratio: 1 / 1;
   width: 100%;
+  overflow: hidden;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.35);
+  background-color: var(--secondary-soft);
+}
+.specimen-photo-img {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  background-color: var(--secondary-soft);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
-.specimen-card:hover .specimen-photo {
+.specimen-card:hover .specimen-photo-img {
   transform: scale(1.08);
 }
 .specimen-body {
