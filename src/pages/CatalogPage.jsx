@@ -3,6 +3,9 @@ import { getMinerals, searchMinerals } from '../api.js';
 import SpecimenCard from '../components/SpecimenCard.jsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
+const RU_LETTERS = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Э','Ю','Я'];
+const EN_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
 export default function CatalogPage() {
   const { lang, t } = useLang();
   const [minerals, setMinerals] = useState([]);
@@ -12,8 +15,11 @@ export default function CatalogPage() {
   const [query, setQuery] = useState('');
   const [rarity, setRarity] = useState('');
   const [russianOnly, setRussianOnly] = useState(false);
+  const [letter, setLetter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const ALPHABET = lang === 'en' ? EN_LETTERS : RU_LETTERS;
 
   const RARITIES = [
     { value: '', label: t('rarity_any') },
@@ -40,6 +46,7 @@ export default function CatalogPage() {
             limit,
             rarity: rarity || undefined,
             russian_only: russianOnly || undefined,
+            letter: letter || undefined,
           });
         }
         if (!cancelled) {
@@ -57,7 +64,7 @@ export default function CatalogPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, rarity, russianOnly, query, lang]);
+  }, [page, limit, rarity, russianOnly, letter, query, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -66,6 +73,30 @@ export default function CatalogPage() {
       <span className="section-label">{t('nav_catalog')}</span>
       <h1 className="section-title">{t('catalog_title')}</h1>
       <p className="section-desc">{t('catalog_desc')}</p>
+
+      <div className="alphabet-bar">
+        <button
+          className={`alphabet-btn${letter === '' ? ' active' : ''}`}
+          onClick={() => {
+            setLetter('');
+            setPage(1);
+          }}
+        >
+          {t('alphabet_all')}
+        </button>
+        {ALPHABET.map((l) => (
+          <button
+            key={l}
+            className={`alphabet-btn${letter === l ? ' active' : ''}`}
+            onClick={() => {
+              setLetter((prev) => (prev === l ? '' : l));
+              setPage(1);
+            }}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
 
       <div className="filters-row">
         <input
