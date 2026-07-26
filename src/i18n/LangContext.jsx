@@ -2,8 +2,8 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'samotsvety_lang';
 
-// Статичные тексты интерфейса. Данные о минералах (i18n.ru / i18n.en) сюда не входят —
-// они выбираются хелпером pickI18n() ниже прямо из ответа API.
+// Статичные тексты интерфейса. Данные о минералах/статьях (i18n.ru / i18n.en) сюда
+// не входят — они выбираются хелперами pickI18n()/pickField() ниже прямо из ответа API.
 const STRINGS = {
   ru: {
     nav_catalog: 'Каталог',
@@ -34,14 +34,23 @@ const STRINGS = {
     formula: 'Формула',
     group: 'Группа',
     crystal_system: 'Кристаллическая система',
+    crystal_habit: 'Форма кристаллов',
     hardness: 'Твёрдость',
     density: 'Плотность',
     luster: 'Блеск',
     transparency: 'Прозрачность',
     streak: 'Цвет черты',
+    cleavage: 'Спайность',
+    fracture: 'Излом',
+    tenacity: 'Вязкость',
+    ima_status: 'Статус IMA',
     rarity: 'Редкость',
     color_title: 'Цвет',
     lore_title: 'История и культура',
+    identification_tips_title: 'Как отличить',
+    composition_title: 'Состав',
+    rock_type_title: 'Тип породы',
+    phenomena_title: 'Оптические эффекты',
     esoteric_title: 'Эзотерика',
     esoteric_properties: 'Свойства:',
     esoteric_chakras: 'Чакры:',
@@ -52,6 +61,11 @@ const STRINGS = {
     gallery_open_alt: 'Открыть фото крупно',
     safety_title: 'Меры предосторожности',
     related_title: 'Похожие минералы',
+
+    // Показывается вместо русского текста, если перевода на выбранный язык нет —
+    // принципиально не откатываемся на другой язык молча.
+    not_translated: 'Перевод пока не готов',
+    not_translated_full: 'Для этого образца пока нет перевода на английский язык.',
 
     articles_title: 'Блог и гиды о камнях',
     articles_desc: 'Истории, гиды по огранке и эзотерические заметки — тянутся напрямую из Samotsvety API.',
@@ -98,14 +112,23 @@ const STRINGS = {
     formula: 'Formula',
     group: 'Group',
     crystal_system: 'Crystal system',
+    crystal_habit: 'Crystal habit',
     hardness: 'Hardness',
     density: 'Density',
     luster: 'Luster',
     transparency: 'Transparency',
     streak: 'Streak',
+    cleavage: 'Cleavage',
+    fracture: 'Fracture',
+    tenacity: 'Tenacity',
+    ima_status: 'IMA status',
     rarity: 'Rarity',
     color_title: 'Color',
     lore_title: 'History & culture',
+    identification_tips_title: 'Identification tips',
+    composition_title: 'Composition',
+    rock_type_title: 'Rock type',
+    phenomena_title: 'Optical phenomena',
     esoteric_title: 'Esoteric properties',
     esoteric_properties: 'Properties:',
     esoteric_chakras: 'Chakras:',
@@ -116,6 +139,9 @@ const STRINGS = {
     gallery_open_alt: 'Open full-size photo',
     safety_title: 'Safety notes',
     related_title: 'Related minerals',
+
+    not_translated: 'Translation pending',
+    not_translated_full: 'This specimen has not been translated into English yet.',
 
     articles_title: 'Blog & gem guides',
     articles_desc: 'Stories, cutting guides, and esoteric notes — pulled directly from the Samotsvety API.',
@@ -171,13 +197,17 @@ export function useLang() {
   return ctx;
 }
 
-// Выбирает языковой блок из mineral.i18n / post.i18n = { ru: {...}, en: {...} }
+// Возвращает языковой блок i18n[lang] или null, если для этого языка перевода
+// вообще нет. ПРИНЦИПИАЛЬНО не откатывается на i18n.ru — если решили показать
+// английский, показываем либо английский, либо явно "перевод не готов", но
+// никогда не подсовываем русский текст молча.
 export function pickI18n(i18n, lang) {
-  return (i18n && (i18n[lang] || i18n.ru)) || {};
+  return i18n?.[lang] ?? null;
 }
 
-// Для полей вида description_ru / description_en на localities и gallery
+// То же самое для точечных полей вида country_ru/country_en, description_ru/en.
+// Без отката на _ru — если английского варианта нет, поле просто не рендерится.
 export function pickField(obj, baseName, lang) {
   if (!obj) return undefined;
-  return obj[`${baseName}_${lang}`] || obj[`${baseName}_ru`];
+  return obj[`${baseName}_${lang}`] || undefined;
 }
