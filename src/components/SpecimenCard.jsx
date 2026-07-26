@@ -23,12 +23,12 @@ export default function SpecimenCard({ mineral }) {
       </div>
       <div className="specimen-body">
         <div className="specimen-name-row">
-          <div className="specimen-name">{data.name || slug}</div>
+          <div className="specimen-name">{data?.name || slug}</div>
           {scientific.rarity && (
             <span className="stock-badge">{t(`rarity_${scientific.rarity}`)}</span>
           )}
         </div>
-        <div className="specimen-latin">{scientific.mineral_group || '—'}</div>
+        <div className="specimen-latin">{data?.mineral_group || (!data ? t('not_translated') : '—')}</div>
         <div className="data-row">
           <span>{t('hardness')}</span>
           <span className="value">
