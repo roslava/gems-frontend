@@ -141,6 +141,93 @@ a {
   color: #fff;
 }
 
+/* ===== ФИЛЬТР ПО ЦВЕТУ — "кристаллы" (та же техника clip-path, что у facet-card) ===== */
+.color-filter {
+  margin-bottom: 24px;
+}
+.color-filter-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: block;
+}
+.color-swatch.unavailable {
+  cursor: default;
+  opacity: 0.32;
+}
+.color-swatch.unavailable .color-swatch-gem {
+  filter: grayscale(0.6);
+}
+.color-swatch.unavailable:hover .color-swatch-gem {
+  transform: none;
+}
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 16px;
+}
+.color-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  width: 62px;
+}
+.color-swatch-gem {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  background: var(--swatch-color, var(--secondary-soft));
+  border: 1.5px solid rgba(35, 38, 43, 0.14);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.color-swatch-gem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.08) 32%,
+    rgba(0, 0, 0, 0.14) 100%
+  );
+}
+.color-swatch-gem.multicolor {
+  background: conic-gradient(from 200deg, #7c5cbf, #2f5d9c, #2e7d5b, #d9a441, #a23b3b, #d98a96, #7c5cbf);
+}
+.color-swatch-all .color-swatch-gem {
+  background: var(--base-card);
+}
+.color-swatch:hover .color-swatch-gem {
+  transform: translateY(-3px);
+}
+.color-swatch-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.25;
+}
+.color-swatch.active .color-swatch-label {
+  color: var(--accent-dark);
+}
+.color-swatch.active .color-swatch-gem {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 /* ===== ФИЛЬТРЫ ===== */
 .filters-row {
   display: flex;

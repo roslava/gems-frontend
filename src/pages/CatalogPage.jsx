@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getMinerals, searchMinerals } from '../api.js';
+import { getMinerals, searchMinerals, getFilters } from '../api.js';
 import SpecimenCard from '../components/SpecimenCard.jsx';
+import ColorSwatchFilter from '../components/ColorSwatchFilter.jsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
 const RU_LETTERS = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Э','Ю','Я'];
@@ -14,6 +15,8 @@ export default function CatalogPage() {
   const [limit] = useState(20);
   const [query, setQuery] = useState('');
   const [rarity, setRarity] = useState('');
+  const [baseColor, setBaseColor] = useState('');
+  const [availableBaseColors, setAvailableBaseColors] = useState(null);
   const [russianOnly, setRussianOnly] = useState(false);
   const [letter, setLetter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,6 +31,25 @@ export default function CatalogPage() {
     { value: 'rare', label: t('rarity_rare') },
     { value: 'very_rare', label: t('rarity_very_rare') },
   ];
+
+  // base_colors языконезависимы, но грузим вместе с lang для единообразия
+  // с остальными вызовами getFilters — вреда нет, а код проще.
+  useEffect(() => {
+    let cancelled = false;
+
+    getFilters({ lang })
+      .then((fv) => {
+        if (cancelled) return;
+        setAvailableBaseColors(fv.base_colors || []);
+      })
+      .catch(() => {
+        if (!cancelled) setAvailableBaseColors(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lang]);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,6 +67,7 @@ export default function CatalogPage() {
             page,
             limit,
             rarity: rarity || undefined,
+            base_color: baseColor || undefined,
             russian_only: russianOnly || undefined,
             letter: letter || undefined,
           });
@@ -64,7 +87,7 @@ export default function CatalogPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, rarity, russianOnly, letter, query, lang]);
+  }, [page, limit, rarity, baseColor, russianOnly, letter, query, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -97,6 +120,15 @@ export default function CatalogPage() {
           </button>
         ))}
       </div>
+
+      <ColorSwatchFilter
+        available={availableBaseColors}
+        value={baseColor}
+        onChange={(next) => {
+          setBaseColor(next);
+          setPage(1);
+        }}
+      />
 
       <div className="filters-row">
         <input

@@ -40,8 +40,8 @@ export function searchMinerals(q, { lang = 'ru' } = {}) {
   return request('/search', { q, lang });
 }
 
-export function getFilters() {
-  return request('/filters');
+export function getFilters({ lang = 'ru' } = {}) {
+  return request('/filters', { lang });
 }
 
 // === Статьи (posts) ===
