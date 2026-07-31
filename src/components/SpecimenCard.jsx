@@ -25,9 +25,6 @@ export default function SpecimenCard({ mineral }) {
       <div className="specimen-body">
         <div className="specimen-name-row">
           <div className="specimen-name">{data?.name || slug}</div>
-          {scientific.rarity && (
-            <span className="stock-badge">{t(`rarity_${scientific.rarity}`)}</span>
-          )}
         </div>
         <div className="specimen-latin">{data?.mineral_group || (!data ? t('not_translated') : '—')}</div>
         <div className="data-row">
@@ -42,6 +39,22 @@ export default function SpecimenCard({ mineral }) {
             {truncate(scientific.chemical_formula) || '—'}
           </span>
         </div>
+        {scientific.rarity && (
+          <div className="rarity-row">
+            <span
+              className="rarity-dot"
+              style={{
+                background:
+                  scientific.rarity === 'rare' || scientific.rarity === 'very_rare'
+                    ? 'var(--accent)'
+                    : 'var(--text-muted-light)',
+              }}
+            />
+            <span className="rarity-label">
+              {t('rarity_label_prefix')} {t(`rarity_${scientific.rarity}`)}
+            </span>
+          </div>
+        )}
       </div>
     </Link>
   );
