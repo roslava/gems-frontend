@@ -21,6 +21,9 @@ export default function CatalogPage() {
   const [letter, setLetter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const activeFilterCount = [rarity, baseColor, russianOnly ? 'x' : ''].filter(Boolean).length;
 
   const ALPHABET = lang === 'en' ? EN_LETTERS : RU_LETTERS;
 
@@ -121,16 +124,7 @@ export default function CatalogPage() {
         ))}
       </div>
 
-      <ColorSwatchFilter
-        available={availableBaseColors}
-        value={baseColor}
-        onChange={(next) => {
-          setBaseColor(next);
-          setPage(1);
-        }}
-      />
-
-      <div className="filters-row">
+      <div className="filters-row" style={{ marginBottom: 16 }}>
         <input
           className="search-input"
           type="text"
@@ -141,30 +135,74 @@ export default function CatalogPage() {
             setPage(1);
           }}
         />
-        <select
-          value={rarity}
-          onChange={(e) => {
-            setRarity(e.target.value);
-            setPage(1);
-          }}
+      </div>
+
+      <div className="filter-bar">
+        <button
+          type="button"
+          className={`filter-toggle${filtersOpen ? ' open' : ''}`}
+          onClick={() => setFiltersOpen((v) => !v)}
         >
-          {RARITIES.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        <label className="checkbox-field">
-          <input
-            type="checkbox"
-            checked={russianOnly}
-            onChange={(e) => {
-              setRussianOnly(e.target.checked);
+          <span>{t('filters_toggle')}</span>
+          {activeFilterCount > 0 && <span className="count">{activeFilterCount}</span>}
+          <span className="chev">▾</span>
+        </button>
+
+        {rarity && (
+          <button type="button" className="active-chip" onClick={() => { setRarity(''); setPage(1); }}>
+            {RARITIES.find((r) => r.value === rarity)?.label} ✕
+          </button>
+        )}
+        {baseColor && (
+          <button type="button" className="active-chip" onClick={() => { setBaseColor(''); setPage(1); }}>
+            {t(`color_${baseColor}`)} ✕
+          </button>
+        )}
+        {russianOnly && (
+          <button type="button" className="active-chip" onClick={() => { setRussianOnly(false); setPage(1); }}>
+            {t('russian_only')} ✕
+          </button>
+        )}
+      </div>
+
+      <div className={`filter-panel${filtersOpen ? ' open' : ''}`}>
+        <div className="filter-panel-inner">
+          <ColorSwatchFilter
+            available={availableBaseColors}
+            value={baseColor}
+            onChange={(next) => {
+              setBaseColor(next);
               setPage(1);
             }}
           />
-          {t('russian_only')}
-        </label>
+
+          <div className="filters-row" style={{ marginBottom: 0, marginTop: 20 }}>
+            <select
+              value={rarity}
+              onChange={(e) => {
+                setRarity(e.target.value);
+                setPage(1);
+              }}
+            >
+              {RARITIES.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            <label className="checkbox-field">
+              <input
+                type="checkbox"
+                checked={russianOnly}
+                onChange={(e) => {
+                  setRussianOnly(e.target.checked);
+                  setPage(1);
+                }}
+              />
+              {t('russian_only')}
+            </label>
+          </div>
+        </div>
       </div>
 
       {loading && <p className="status-text">{t('loading')}</p>}
