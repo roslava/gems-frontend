@@ -66,8 +66,8 @@ export default function MineralPage() {
     related_minerals = [],
   } = mineral;
 
-  // pickI18n РІРѕР·РІСЂР°С‰Р°РµС‚ null, РµСЃР»Рё РґР»СЏ СЌС‚РѕРіРѕ СЏР·С‹РєР° РІРѕРѕР±С‰Рµ РЅРµС‚ РїРµСЂРµРІРѕРґР° вЂ”
-  // С‚РѕРіРґР° С‡РµСЃС‚РЅРѕ РїРѕРєР°Р·С‹РІР°РµРј Р·Р°РіР»СѓС€РєСѓ, Р° РЅРµ СЂСѓСЃСЃРєРёР№ С‚РµРєСЃС‚ РёСЃРїРѕРґС‚РёС€РєР°.
+  // pickI18n возвращает null, если для этого языка вообще нет перевода —
+  // тогда честно показываем заглушку, а не русский текст исподтишка.
   const data = pickI18n(i18n, lang);
   const esoteric = data?.esoteric;
 
@@ -103,7 +103,7 @@ export default function MineralPage() {
 
       {main_image_url && <img className="mineral-hero-image" src={main_image_url} alt={data?.name || slug} />}
 
-      {/* Р¤РѕСЂРјСѓР»Р°, С‚РІС‘СЂРґРѕСЃС‚СЊ, РїР»РѕС‚РЅРѕСЃС‚СЊ, СЂРµРґРєРѕСЃС‚СЊ вЂ” СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹ РґР»СЏ Р»СЋР±РѕРіРѕ СЏР·С‹РєР° */}
+      {/* Формула, твёрдость, плотность, редкость — универсальны для любого языка */}
       <div className="hero-visual mineral-data-card">
         <div className="data-row" style={{ borderTop: 'none' }}>
           <span>{t('formula')}</span>
@@ -130,14 +130,14 @@ export default function MineralPage() {
         <div className="data-row">
           <span>{t('hardness')}</span>
           <span className="value">
-            {scientific.hardness?.min}вЂ“{scientific.hardness?.max}
+            {scientific.hardness?.min}–{scientific.hardness?.max}
             {data?.hardness_note ? ` (${data.hardness_note})` : ''}
           </span>
         </div>
         <div className="data-row">
           <span>{t('density')}</span>
           <span className="value">
-            {scientific.specific_gravity?.min}вЂ“{scientific.specific_gravity?.max} Рі/СЃРјВі
+            {scientific.specific_gravity?.min}–{scientific.specific_gravity?.max} г/см³
           </span>
         </div>
         {data?.luster && (
@@ -272,8 +272,8 @@ export default function MineralPage() {
               const localityName = pickField(loc, 'locality', lang);
               const desc = pickField(loc, 'description', lang);
 
-              // Р•СЃР»Рё РґР»СЏ СЌС‚РѕР№ Р»РѕРєР°С†РёРё РЅРµС‚ РїРµСЂРµРІРѕРґР° РІРѕРѕР±С‰Рµ РЅРё РЅР° РѕРґРЅРѕ РїРѕР»Рµ вЂ” РїСЂРѕРїСѓСЃРєР°РµРј,
-              // Р° РЅРµ РїРѕРєР°Р·С‹РІР°РµРј СЂСѓСЃСЃРєРёР№ С‚РµРєСЃС‚ РїРѕРґ РІРёРґРѕРј Р°РЅРіР»РёР№СЃРєРѕРіРѕ.
+              // Если для этой локации нет перевода вообще ни на одно поле — пропускаем,
+              // а не показываем русский текст под видом английского.
               if (!country && !region && !localityName && !desc) return null;
 
               return (
@@ -282,7 +282,7 @@ export default function MineralPage() {
                     {country}
                     {region ? `, ${region}` : ''}
                   </strong>
-                  {localityName ? ` вЂ” ${localityName}` : ''}
+                  {localityName ? ` — ${localityName}` : ''}
                   {loc.is_russian && (
                     <span className="chip chip-active" style={{ marginLeft: 8 }}>
                       {t('russia_badge')}
