@@ -13,8 +13,11 @@ function resolveImageUrls(block, langData) {
   return block.image_urls || [];
 }
 
-function HeadingBlock({ langData }) {
+function HeadingBlock({ block, langData }) {
   if (!langData?.text) return null;
+  if (block.level === 'subheading') {
+    return <h3 className="block-col block-subheading">{langData.text}</h3>;
+  }
   return <h2 className="block-col block-heading">{langData.text}</h2>;
 }
 
@@ -92,7 +95,7 @@ export default function BlockRenderer({ blocks, lang }) {
 
         switch (block.type) {
           case 'heading':
-            return <HeadingBlock key={block.id} langData={langData} />;
+            return <HeadingBlock key={block.id} block={block} langData={langData} />;
           case 'paragraph':
             return <ParagraphBlock key={block.id} langData={langData} />;
           case 'image':
