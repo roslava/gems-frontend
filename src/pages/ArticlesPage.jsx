@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getPosts, searchPosts } from '../api.js';
-import ArticleCard, { POST_TYPE_KEYS } from '../components/ArticleCard.jsx';
+import ArticleCard from '../components/ArticleCard.jsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
 export default function ArticlesPage() {
@@ -10,14 +10,8 @@ export default function ArticlesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(12);
   const [query, setQuery] = useState('');
-  const [type, setType] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const TYPES = [
-    { value: '', label: t('type_any') },
-    ...Object.entries(POST_TYPE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
-  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -30,12 +24,7 @@ export default function ArticlesPage() {
         if (query.trim()) {
           result = await searchPosts(query.trim(), { lang });
         } else {
-          result = await getPosts({
-            lang,
-            page,
-            limit,
-            type: type || undefined,
-          });
+          result = await getPosts({ lang, page, limit });
         }
         if (!cancelled) {
           setPosts(result.data || []);
@@ -52,7 +41,7 @@ export default function ArticlesPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, type, query, lang]);
+  }, [page, limit, query, lang]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -73,19 +62,6 @@ export default function ArticlesPage() {
             setPage(1);
           }}
         />
-        <select
-          value={type}
-          onChange={(e) => {
-            setType(e.target.value);
-            setPage(1);
-          }}
-        >
-          {TYPES.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
       </div>
 
       {loading && <p className="status-text">{t('loading')}</p>}

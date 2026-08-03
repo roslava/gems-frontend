@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { getPost } from '../api.js';
-import { POST_TYPE_KEYS } from '../components/ArticleCard.jsx';
 import BlockRenderer from '../components/BlockRenderer.jsx';
 import { useLang, pickI18n } from '../i18n/LangContext.jsx';
 
@@ -79,7 +78,6 @@ export default function ArticlePage() {
   if (!post) return null;
 
   const {
-    type,
     cover_image: coverImage,
     published_at: publishedAt,
     author,
@@ -88,7 +86,6 @@ export default function ArticlePage() {
   } = post;
 
   const date = formatDate(publishedAt, lang === 'en' ? 'en-US' : 'ru-RU');
-  const typeLabel = type && POST_TYPE_KEYS[type] ? t(POST_TYPE_KEYS[type]) : type;
 
   return (
     <div className="section article-page">
@@ -98,7 +95,7 @@ export default function ArticlePage() {
 
       <div className="mineral-header">
         <div>
-          {typeLabel && <span className="section-label">{typeLabel}</span>}
+          <span className="section-label">{t('nav_articles')}</span>
           <h1 className="section-title">{data.title}</h1>
           {(date || author) && (
             <p className="section-desc article-meta">

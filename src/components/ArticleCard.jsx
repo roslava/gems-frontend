@@ -1,14 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLang, pickI18n } from '../i18n/LangContext.jsx';
 
-export const POST_TYPE_KEYS = {
-  blog: 'post_type_blog',
-  guide: 'post_type_guide',
-  history: 'post_type_history',
-  esoteric: 'post_type_esoteric',
-  review: 'post_type_review',
-};
-
 function formatDate(iso, locale) {
   if (!iso) return null;
   try {
@@ -26,7 +18,6 @@ export default function ArticleCard({ post }) {
   const { lang, t } = useLang();
   const {
     slug,
-    type,
     i18n = {},
     cover_image: coverImage,
     published_at: publishedAt,
@@ -36,7 +27,6 @@ export default function ArticleCard({ post }) {
 
   const data = pickI18n(i18n, lang);
   const date = formatDate(publishedAt, lang === 'en' ? 'en-US' : 'ru-RU');
-  const typeLabel = type && POST_TYPE_KEYS[type] ? t(POST_TYPE_KEYS[type]) : type;
 
   return (
     <Link to={`/articles/${slug}`} className="specimen-card facet-card article-card">
@@ -49,7 +39,6 @@ export default function ArticleCard({ post }) {
       <div className="specimen-body">
         <div className="specimen-name-row">
           <div className="specimen-name">{data.title || slug}</div>
-          {typeLabel && <span className="stock-badge">{typeLabel}</span>}
         </div>
         {(date || author) && (
           <div className="specimen-latin article-meta">
