@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { getPost } from '../api.js';
 import { POST_TYPE_KEYS } from '../components/ArticleCard.jsx';
+import BlockRenderer from '../components/BlockRenderer.jsx';
 import { useLang, pickI18n } from '../i18n/LangContext.jsx';
 
 function formatDate(iso, locale) {
@@ -113,11 +114,15 @@ export default function ArticlePage() {
 
       {data.excerpt && <p className="article-excerpt article-lead">{data.excerpt}</p>}
 
-      {contentHtml && (
-        <div
-          className="mineral-block article-content"
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
+      {post.content_blocks && post.content_blocks.length > 0 ? (
+        <BlockRenderer blocks={post.content_blocks} lang={lang} />
+      ) : (
+        contentHtml && (
+          <div
+            className="mineral-block article-content"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
+        )
       )}
 
       {tags.length > 0 && (
