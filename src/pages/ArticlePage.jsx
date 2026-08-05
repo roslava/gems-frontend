@@ -86,6 +86,7 @@ export default function ArticlePage() {
   } = post;
 
   const date = formatDate(publishedAt, lang === 'en' ? 'en-US' : 'ru-RU');
+  const resolvedCover = data?.cover_image || coverImage;
 
   return (
     <div className="section article-page">
@@ -107,7 +108,7 @@ export default function ArticlePage() {
         </div>
       </div>
 
-      {coverImage && <img className="mineral-hero-image" src={coverImage} alt={data.title} />}
+      {resolvedCover && <img className="mineral-hero-image" src={resolvedCover} alt={data.title} />}
 
       {data.excerpt && <p className="article-excerpt article-lead">{data.excerpt}</p>}
 

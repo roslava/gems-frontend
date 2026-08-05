@@ -1,3 +1,5 @@
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { pickI18n } from '../i18n/LangContext.jsx';
 
 // Картинка блока: если для текущего языка задан override (нужно для схем/диаграмм
@@ -23,18 +25,11 @@ function HeadingBlock({ block, langData }) {
 
 function ParagraphBlock({ langData }) {
   if (!langData?.text) return null;
-  // Текст блока — обычный текст с сохранением переносов строк, без markdown-парсинга:
-  // композиция здесь задаётся структурой блоков, а не разметкой внутри текста.
-  return (
-    <p className="block-col block-paragraph">
-      {langData.text.split('\n').map((line, i, arr) => (
-        <span key={i}>
-          {line}
-          {i < arr.length - 1 && <br />}
-        </span>
-      ))}
-    </p>
-  );
+  // Текст абзаца поддерживает лёгкий markdown (полужирный, списки) — набирается
+  // через кнопки панели форматирования в админке, либо руками. Рендерим тем же
+  // способом (marked + DOMPurify), что и legacy-контент статьи.
+  const html = DOMPurify.sanitize(marked.parse(langData.text));
+  return <div className="block-col block-paragraph" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 function ImageBlock({ block, langData }) {

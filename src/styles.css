@@ -870,7 +870,27 @@ a {
   font-size: 15.5px;
   line-height: 1.7;
   color: var(--text-dark);
+}
+.block-paragraph p {
   margin: 0;
+}
+.block-paragraph p + p {
+  margin-top: 14px;
+}
+.block-paragraph strong {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.block-paragraph ul,
+.block-paragraph ol {
+  margin: 14px 0 0;
+  padding-left: 22px;
+}
+.block-paragraph li {
+  margin-top: 6px;
+}
+.block-paragraph li::marker {
+  color: var(--accent);
 }
 
 /* Картинка на всю ширину секции — выходит за пределы читательской колонки,

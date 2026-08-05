@@ -27,14 +27,17 @@ export default function ArticleCard({ post }) {
 
   const data = pickI18n(i18n, lang);
   const date = formatDate(publishedAt, lang === 'en' ? 'en-US' : 'ru-RU');
+  // Если для языка задана своя обложка (баннер с текстом на картинке) — берём её,
+  // иначе общая обложка статьи.
+  const resolvedCover = data?.cover_image || coverImage;
 
   return (
     <Link to={`/articles/${slug}`} className="specimen-card facet-card article-card">
       <div
         className="specimen-photo article-photo"
-        style={coverImage ? { backgroundImage: `url(${coverImage})` } : undefined}
+        style={resolvedCover ? { backgroundImage: `url(${resolvedCover})` } : undefined}
       >
-        {!coverImage && t('no_cover')}
+        {!resolvedCover && t('no_cover')}
       </div>
       <div className="specimen-body">
         <div className="specimen-name-row">
