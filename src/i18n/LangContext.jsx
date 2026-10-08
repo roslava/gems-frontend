@@ -77,7 +77,7 @@ const STRINGS = {
     gallery_title: 'Галерея',
     gallery_open_alt: 'Открыть фото крупно',
     safety_title: 'Меры предосторожности',
-    related_title: 'Похожие минералы',
+    related_title: 'Связанные камни',
 
     // Показывается вместо русского текста, если перевода на выбранный язык нет —
     // принципиально не откатываемся на другой язык молча.
@@ -172,7 +172,7 @@ const STRINGS = {
     gallery_title: 'Gallery',
     gallery_open_alt: 'Open full-size photo',
     safety_title: 'Safety notes',
-    related_title: 'Related minerals',
+    related_title: 'Related stones',
 
     not_translated: 'Translation pending',
     not_translated_full: 'This specimen has not been translated into English yet.',

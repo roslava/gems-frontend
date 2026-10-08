@@ -518,6 +518,11 @@ a {
   background: var(--accent-soft);
   color: var(--accent-dark);
 }
+.related-chip {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 .row {
   display: flex;
   flex-wrap: wrap;

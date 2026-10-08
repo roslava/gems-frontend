@@ -1,10 +1,10 @@
 // Тонкий слой поверх fetch для Samotsvety API.
 // Базовый адрес задаётся через VITE_API_BASE_URL (см. .env.example).
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
 
-async function request(path, params = {}) {
-  const url = new URL(`${API_BASE}/api/v1${path}`);
+async function request(path, params = {}, { version = 'v1', cache } = {}) {
+  const url = new URL(`${API_BASE}/api/${version}${path}`);
 
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -14,7 +14,7 @@ async function request(path, params = {}) {
 
   let res;
   try {
-    res = await fetch(url.toString());
+    res = await fetch(url.toString(), cache ? { cache } : undefined);
   } catch (err) {
     throw new Error(
       `Не удалось подключиться к API по адресу ${API_BASE}. Проверьте, что сервер запущен и CORS настроен.`
@@ -34,6 +34,12 @@ export function getMinerals({ lang = 'ru', view = 'normal', page = 1, limit = 20
 
 export function getMineral(slug, { lang = 'ru', view = 'normal' } = {}) {
   return request(`/minerals/${slug}`, { lang, view });
+}
+
+export async function getRelatedGemEntities(slug) {
+  const result = await request(`/gem-entities/${encodeURIComponent(slug)}/related`, {}, { version: 'v2', cache: 'no-store' });
+  if (!Array.isArray(result?.data)) throw new Error('Некорректный ответ API связанных камней');
+  return result.data;
 }
 
 export function searchMinerals(q, { lang = 'ru' } = {}) {

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getMineral } from '../api.js';
+import { getMineral, getRelatedGemEntities } from '../api.js';
 import Lightbox from '../components/Lightbox.jsx';
 import { useLang, pickI18n, pickField } from '../i18n/LangContext.jsx';
+import { relatedEntityLinks } from '../relatedEntities.js';
 
 export default function MineralPage() {
   const { slug } = useParams();
@@ -12,6 +13,7 @@ export default function MineralPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [related, setRelated] = useState({ slug: null, items: [] });
 
   useEffect(() => {
     let cancelled = false;
@@ -33,6 +35,15 @@ export default function MineralPage() {
       cancelled = true;
     };
   }, [slug, view, lang]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setRelated({ slug, items: [] });
+    getRelatedGemEntities(slug)
+      .then((items) => { if (!cancelled) setRelated({ slug, items }); })
+      .catch(() => { if (!cancelled) setRelated({ slug, items: [] }); });
+    return () => { cancelled = true; };
+  }, [slug]);
 
   if (loading) {
     return (
@@ -63,13 +74,13 @@ export default function MineralPage() {
     localities = [],
     gallery = [],
     main_image_url,
-    related_minerals = [],
   } = mineral;
 
   // pickI18n возвращает null, если для этого языка вообще нет перевода —
   // тогда честно показываем заглушку, а не русский текст исподтишка.
   const data = pickI18n(i18n, lang);
   const esoteric = data?.esoteric;
+  const relatedLinks = relatedEntityLinks(related.slug === slug ? related.items : [], lang, slug);
 
   return (
     <div className="section mineral-page">
@@ -333,13 +344,13 @@ export default function MineralPage() {
         </div>
       )}
 
-      {related_minerals.length > 0 && (
+      {relatedLinks.length > 0 && (
         <div className="mineral-block">
           <h3>{t('related_title')}</h3>
           <div className="row">
-            {related_minerals.map((relSlug) => (
-              <Link key={relSlug} to={`/minerals/${relSlug}`} className="chip chip-active">
-                {relSlug}
+            {relatedLinks.map((entity) => (
+              <Link key={entity.slug} to={entity.href} className="chip chip-active related-chip">
+                {entity.label}
               </Link>
             ))}
           </div>
