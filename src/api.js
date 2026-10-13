@@ -1,65 +1,50 @@
-// Тонкий слой поверх fetch для Samotsvety API.
-// Базовый адрес задаётся через VITE_API_BASE_URL (см. .env.example).
+import { parseGemList, parseGemPage, parseGemEntity } from './gemV2.js';
 
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
-async function request(path, params = {}, { version = 'v1', cache } = {}) {
-  const url = new URL(`${API_BASE}/api/${version}${path}`);
-
+async function request(path, params = {}, { version = 'v1', signal, cache } = {}) {
+  const url = new URL(`${API_BASE}/api/${version}${path}`, globalThis.location?.origin || 'http://localhost:5173');
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      url.searchParams.set(key, value);
-    }
+    if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value);
   });
-
   let res;
-  try {
-    res = await fetch(url.toString(), cache ? { cache } : undefined);
-  } catch (err) {
-    throw new Error(
-      `Не удалось подключиться к API по адресу ${API_BASE}. Проверьте, что сервер запущен и CORS настроен.`
-    );
+  try { res = await fetch(url.toString(), { signal, cache }); }
+  catch (err) {
+    if (err.name === 'AbortError') throw err;
+    throw new Error('API недоступен. Проверьте подключение к серверу.');
   }
-
   if (!res.ok) {
-    throw new Error(`API вернул ошибку ${res.status} для ${path}`);
+    const error = new Error(`API вернул ошибку ${res.status}`);
+    error.status = res.status;
+    throw error;
   }
-
   return res.json();
 }
 
-export function getMinerals({ lang = 'ru', view = 'normal', page = 1, limit = 20, ...filters } = {}) {
-  return request('/minerals', { lang, view, page, limit, ...filters });
+export async function getGemEntities({ signal } = {}) {
+  return parseGemList(await request('/gem-entities', {}, { version: 'v2', signal }));
 }
 
-export function getMineral(slug, { lang = 'ru', view = 'normal' } = {}) {
-  return request(`/minerals/${slug}`, { lang, view });
+export async function getGemEntity(slug, { signal } = {}) {
+  return parseGemEntity(await request(`/gem-entities/${encodeURIComponent(slug)}`, {}, { version: 'v2', signal }));
 }
 
-export async function getRelatedGemEntities(slug) {
-  const result = await request(`/gem-entities/${encodeURIComponent(slug)}/related`, {}, { version: 'v2', cache: 'no-store' });
+export async function getRelatedGemEntities(slug, { signal } = {}) {
+  const result = await request(`/gem-entities/${encodeURIComponent(slug)}/related`, {}, { version: 'v2', signal, cache: 'no-store' });
   if (!Array.isArray(result?.data)) throw new Error('Некорректный ответ API связанных камней');
   return result.data;
 }
 
-export function searchMinerals(q, { lang = 'ru' } = {}) {
-  return request('/search', { q, lang });
+// Articles retain their independent V1 contract.
+export function getPosts({ lang = 'ru', page = 1, limit = 20, signal, ...filters } = {}) {
+  return request('/posts', { lang, page, limit, published: true, ...filters }, { signal });
 }
+export function getPost(slug, { lang = 'ru' } = {}) { return request(`/posts/${encodeURIComponent(slug)}`, { lang }); }
+export function searchPosts(q, { lang = 'ru', limit = 20, signal } = {}) { return request('/search/posts', { q, lang, limit }, { signal }); }
 
-export function getFilters({ lang = 'ru' } = {}) {
-  return request('/filters', { lang });
-}
-
-// === Статьи (posts) ===
-
-export function getPosts({ lang = 'ru', page = 1, limit = 20, ...filters } = {}) {
-  return request('/posts', { lang, page, limit, published: true, ...filters });
-}
-
-export function getPost(slug, { lang = 'ru' } = {}) {
-  return request(`/posts/${slug}`, { lang });
-}
-
-export function searchPosts(q, { lang = 'ru', limit = 20 } = {}) {
-  return request('/search/posts', { q, lang, limit });
+export async function getGemPage({ page = 1, limit = 20, lang = 'ru', query = '', rarity = '', baseColor = '', russianOnly = false, letter = '', signal } = {}) {
+  return parseGemPage(await request('/gem-entities', {
+    page, limit, lang, q: query, rarity, base_color: baseColor,
+    country_code: russianOnly ? 'RU' : '', letter,
+  }, { version: 'v2', signal }));
 }

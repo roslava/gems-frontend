@@ -168,7 +168,7 @@ a {
 .color-swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 12px;
+  gap: 4px;
 }
 .color-swatch {
   display: flex;
@@ -178,8 +178,10 @@ a {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 2px;
-  width: 46px;
+  padding: 8px;
+  width: 40px;
+  min-height: 40px;
+  justify-content: center;
 }
 .color-swatch-gem {
   position: relative;
@@ -244,33 +246,35 @@ a {
 .filter-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
   font-family: 'Inter', sans-serif;
-  font-size: 14.5px;
-  font-weight: 600;
-  padding: 12px 20px;
-  background: var(--secondary);
-  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-muted);
   border: none;
+  border-radius: 5px;
   cursor: pointer;
-  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
+  transition: background 0.18s ease, color 0.18s ease;
 }
+.filter-toggle:hover {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+.filter-toggle.open,
+.filter-toggle.has-filters { color: var(--accent-dark); }
 .filter-toggle .count {
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 1px 7px;
-  border-radius: 999px;
-  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 600;
 }
-.filter-toggle .chev {
-  font-size: 11px;
-  transition: transform 0.2s ease;
-}
-.filter-toggle.open .chev {
-  transform: rotate(180deg);
-}
+.filter-toggle .filter-icon,
+.filter-toggle .chev { flex-shrink: 0; }
+.filter-toggle .chev { transition: transform 0.2s ease; }
+.filter-toggle.open .chev { transform: rotate(180deg); }
 .active-chip {
   display: inline-flex;
   align-items: center;
@@ -395,7 +399,7 @@ a {
   clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
 }
 .specimen-card {
-  background: var(--secondary);
+  background: transparent;
   color: var(--text-light);
   box-shadow: var(--shadow-soft);
   display: block;
@@ -413,13 +417,17 @@ a {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.35);
-  background-color: var(--secondary-soft);
+  background-color: transparent;
+}
+.specimen-photo:not(:has(.specimen-photo-img)) {
+  background: var(--secondary-soft);
 }
 .specimen-photo-img {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
@@ -427,6 +435,7 @@ a {
   transform: scale(1.08);
 }
 .specimen-body {
+  background: var(--secondary);
   padding: 18px 20px 20px;
 }
 .specimen-name-row {
@@ -550,7 +559,7 @@ a {
 .mineral-hero-image {
   width: 100%;
   max-height: 360px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 6px;
   margin-bottom: 24px;
 }
@@ -620,7 +629,7 @@ a {
 .gallery-thumb img {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
 }
@@ -647,7 +656,9 @@ a {
 .lightbox-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(17, 19, 22, 0.92);
+  background: rgba(17, 19, 22, 0.65);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1027,3 +1038,639 @@ a {
 }
 .lang-switch button.active { background: var(--accent, #2E7D5B); color: #fff; border-color: var(--accent, #2E7D5B); }
 .lang-switch button:disabled { cursor: default; }
+
+/* Full-width formulas wrap between chemical groups without hiding content. */
+.specimen-card .formula-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.chemical-formula {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text-light);
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.6;
+  text-align: left;
+}
+.chemical-formula-group {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Compact catalog navigation and clearer specimen labels. */
+.site-header {
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+  padding: 16px 32px;
+}
+.site-header-right { margin-left: auto; }
+.lang-switch button { color: var(--text-light); min-height: 32px; }
+.catalog-section { padding-top: 28px; }
+.catalog-section .section-title { margin-bottom: 20px; }
+.catalog-search { margin-bottom: 14px; }
+.catalog-section .alphabet-bar { gap: 3px; margin-bottom: 14px; }
+.catalog-section .alphabet-btn {
+  border-color: transparent;
+  background: transparent;
+  min-width: 28px;
+  height: 32px;
+  padding: 0 5px;
+  color: var(--text-muted);
+}
+.catalog-section .alphabet-btn:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.catalog-section .alphabet-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+.catalog-toolbar { align-items: center; }
+.catalog-count {
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.specimen-latin {
+  font-style: normal;
+  font-size: 13px;
+  color: #bdb9ac;
+}
+.rarity-badge {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 3px 8px;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  color: #c8c4b8;
+}
+.rarity-badge-accent {
+  border-color: rgba(195, 75, 42, .5);
+  color: #eda58d;
+}
+@media (max-width: 480px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px 16px;
+    padding: 14px 20px;
+  }
+  .site-nav { grid-column: 1 / -1; grid-row: 2; }
+  .site-header-right { grid-column: 2; grid-row: 1; }
+  .catalog-section { padding: 24px 20px 48px; }
+}
+
+/* Search and filters form one compact control row. */
+.catalog-search {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+.catalog-search .search-input { min-width: 0; }
+.catalog-search .filter-toggle { flex-shrink: 0; }
+@media (max-width: 480px) {
+  .catalog-search { flex-wrap: wrap; gap: 6px; }
+  .catalog-search .search-input { flex-basis: 100%; }
+  .catalog-search .filter-toggle { margin-left: auto; }
+}
+
+/* Two balanced filter groups, with all rarity choices visible. */
+.catalog-filter-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.catalog-filter-layout .color-filter { margin-bottom: 0; }
+.rarity-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.rarity-option {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.rarity-option:hover { border-color: var(--accent); color: var(--accent-dark); }
+.rarity-option.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent-dark);
+}
+@media (max-width: 720px) {
+  .catalog-filter-layout { grid-template-columns: 1fr; gap: 20px; }
+}
+
+/* Continuous palette of discrete categories, rather than an ambiguous gradient. */
+.color-segment-strip {
+  display: flex;
+  width: 100%;
+  border-radius: 5px;
+  isolation: isolate;
+}
+.color-segment {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(23, 21, 18, .08);
+}
+.color-segment:first-child { border-radius: 5px 0 0 5px; }
+.color-segment:last-child { border-radius: 0 5px 5px 0; }
+.color-segment:hover { z-index: 1; outline: 2px solid var(--text-dark); outline-offset: -2px; }
+.color-segment:focus-visible { z-index: 2; }
+.color-segment.active {
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px var(--text-dark);
+}
+.color-segment.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid var(--text-dark);
+}
+.color-segment:disabled { opacity: .35; cursor: default; }
+.color-palette-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.color-reset {
+  border: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  padding: 4px 0;
+  font: inherit;
+  cursor: pointer;
+}
+.color-reset:hover { text-decoration: underline; }
+
+/* Mineral pages: visual introduction followed by a readable reference. */
+.mineral-editorial > .btn-ghost { margin-bottom: 24px; }
+.mineral-intro-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 44px; align-items: start; }
+.mineral-cover { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; clip-path: polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%); }
+.mineral-thumbnails { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+.mineral-thumbnails .gallery-thumb { width: 100%; aspect-ratio: 1; }
+.mineral-thumbnails .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.mineral-summary { padding-top: 0; }
+.mineral-summary .section-title { font-size: clamp(36px,4vw,52px); margin-bottom: 12px; }
+.mineral-aliases { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; }
+.mineral-lead { font-size: 18px; line-height: 1.7; margin-bottom: 26px; }
+.mineral-quick-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid var(--border); padding-top: 22px; }
+.mineral-quick-facts dt { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+.mineral-quick-facts dd { margin: 0; font-size: 17px; }
+.mineral-quick-facts .quick-formula { grid-column: 1 / -1; }
+.mineral-editorial .chemical-formula { color: var(--text-dark); font-size: 15px; }
+.mineral-section-nav { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 20px 0; margin: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+.mineral-section-nav a:hover { color: var(--accent-dark); }
+.mineral-reading { max-width: 850px; }
+.mineral-editorial .mineral-block { background: transparent; border: 0; border-radius: 0; padding: 0; margin: 0 0 36px; scroll-margin-top: 24px; }
+.mineral-editorial .mineral-block h2 { font-size: 26px; margin-bottom: 14px; }
+.mineral-editorial .mineral-block h3 { font-size: 19px; margin-bottom: 10px; }
+.mineral-editorial .mineral-block p { max-width: 70ch; font-size: 15px; line-height: 1.85; margin-bottom: 12px; }
+.mineral-fact-groups { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; margin-bottom: 20px; }
+.mineral-fact-group { background: var(--base-card); border-radius: 6px; padding: 20px; }
+.mineral-fact-group dl { margin: 0; }
+.mineral-fact-group dl > div { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.25fr); gap: 12px; border-top: 1px solid var(--border); padding: 10px 0; font-size: 13px; }
+.mineral-fact-group dt { color: var(--text-muted); }
+.mineral-fact-group dd { margin: 0; overflow-wrap: anywhere; }
+.mineral-note { margin-top: 20px; }
+.mineral-editorial .mineral-care { background: var(--accent-soft); padding: 24px; border-radius: 6px; }
+.mineral-esoteric summary { cursor: pointer; font-family: 'PT Sans Narrow',sans-serif; font-size: 24px; font-weight: 700; padding: 12px 0; border-top: 1px solid var(--border); }
+@media(max-width:720px) {
+ .mineral-intro-grid { grid-template-columns: 1fr; gap: 24px; }
+ .mineral-summary { padding-top: 0; }
+ .mineral-fact-groups { grid-template-columns: 1fr; }
+ .mineral-section-nav { gap: 12px 18px; }
+ .mineral-editorial { padding: 24px 20px 48px; }
+}
+
+.mineral-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 24px;
+  padding: 0;
+  scrollbar-width: thin;
+}
+.mineral-tabs [role="tab"] {
+  flex: 0 0 auto;
+  padding: 16px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.mineral-tabs [role="tab"]:hover { color: var(--accent-dark); }
+.mineral-tabs [aria-selected="true"] {
+  color: var(--accent-dark);
+  border-bottom-color: var(--accent);
+}
+.mineral-editorial [role="tabpanel"][hidden] { display: none; }
+.mineral-editorial [role="tabpanel"] { min-height: 160px; }
+
+/* A compact passport: label and value on the same line. */
+.mineral-quick-facts {
+  display: block;
+  border-top: 0;
+  padding-top: 0;
+}
+.mineral-quick-facts > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mineral-quick-facts dt {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 14px;
+}
+.mineral-quick-facts dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+}
+.mineral-quick-facts .chemical-formula { font-size: inherit; }
+
+/* Reserve two readable lines for every catalog title. */
+.specimen-name-row { min-width: 0; }
+.specimen-name {
+  width: 100%;
+  min-width: 0;
+  line-height: 1.25;
+  height: 2.5em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+/* Photo-led collection cards on the shared light canvas. */
+.collection-card {
+  background: transparent;
+  color: var(--text-dark);
+  box-shadow: none;
+  overflow: visible;
+}
+.collection-card .specimen-photo { border-radius: 0; }
+.collection-card .specimen-body {
+  background: transparent;
+  padding: 12px 0 4px;
+}
+.collection-card .specimen-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  height: auto;
+  transition: color .18s ease;
+}
+.collection-card:hover .specimen-name { color: var(--accent-dark); }
+.collection-card .specimen-latin {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 0;
+}
+.collection-card .rarity-row { margin-top: 5px; }
+.collection-card .rarity-badge {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.collection-card .rarity-badge-accent { color: var(--accent-dark); }
+.collection-card .specimen-photo:not(:has(.specimen-photo-img)) {
+  background: var(--base-card);
+  color: var(--text-muted);
+}
+
+.collection-card .specimen-name-row { margin-bottom: 5px; }
+
+/* Editorial catalog experiment: broad images, compact captions, ruled rows. */
+.catalog-section {
+  max-width: 1600px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+.catalog-section .cards-grid {
+  column-gap: 10px;
+  row-gap: 18px;
+}
+.catalog-section .collection-card {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px;
+}
+.catalog-section .collection-card .specimen-body { padding-top: 9px; }
+.catalog-section .collection-card .specimen-name { font-size: 15px; }
+.catalog-section .collection-card .specimen-name-row { margin-bottom: 3px; }
+.catalog-section .collection-card .rarity-row { margin-top: 3px; }
+@media (max-width: 720px) {
+  .catalog-section { padding-left: 20px; padding-right: 20px; }
+  .catalog-section .cards-grid { column-gap: 10px; row-gap: 16px; }
+}
+
+/* Editorial header: name, centered navigation, languages, a single rule. */
+.site-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 32px;
+  background: var(--base);
+  color: var(--text-dark);
+  border-bottom: 1px solid var(--border);
+}
+.site-header .logo { justify-self: start; font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; }
+.site-header .logo span { color: inherit; }
+.site-header .site-nav { grid-column: 2; grid-row: 1; justify-self: center; font-size: 13px; }
+.site-header .site-nav a { color: var(--text-muted); }
+.site-header .site-nav a:hover,
+.site-header .site-nav a.active { color: var(--accent-dark); }
+.site-header .site-header-right { grid-column: 3; grid-row: 1; justify-self: end; margin-left: 0; }
+.site-header .lang-switch { gap: 10px; }
+.site-header .lang-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 4px 2px;
+  font-family: 'Inter', sans-serif;
+}
+.site-header .lang-switch button.active { background: transparent; color: var(--text-dark); font-weight: 600; }
+.site-header .lang-switch button:hover:not(:disabled) { color: var(--accent-dark); }
+@media (max-width: 480px) {
+  .site-header { grid-template-columns: 1fr auto; padding: 12px 20px; gap: 8px 16px; }
+  .site-header .site-header-right { grid-column: 2; grid-row: 1; }
+  .site-header .site-nav { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+}
+
+/* Sticky glass header stays above content and below the photo viewer. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(237, 231, 218, 0.82);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Native modal drawer provides focus containment and background isolation. */
+.filter-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  margin: 0;
+  width: min(420px, 100%);
+  height: 100dvh;
+  max-height: none;
+  max-width: 100%;
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  background: var(--base-card);
+  color: var(--text-dark);
+  overflow-y: auto;
+}
+.filter-drawer[open] { animation: filter-drawer-enter .24s ease-out; }
+.filter-drawer::backdrop {
+  background: rgba(23,21,18,.28);
+  backdrop-filter: blur(3px);
+}
+.filter-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.filter-drawer-header h2 { font-size: 24px; margin: 0; }
+.filter-drawer-close {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+}
+.filter-drawer-close:hover { background: var(--accent-soft); color: var(--accent-dark); }
+.filter-drawer .catalog-filter-layout { grid-template-columns: 1fr; gap: 32px; padding: 0; }
+@keyframes filter-drawer-enter {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@media(prefers-reduced-motion: reduce) { .filter-drawer[open] { animation: none; } }
+
+.filter-drawer[open] { display: flex; flex-direction: column; }
+.filter-drawer-header { flex-shrink: 0; }
+.filter-drawer-content { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 2px 24px; }
+.filter-drawer-footer { flex-shrink: 0; border-top: 1px solid var(--border); padding-top: 20px; display: grid; gap: 10px; }
+.drawer-show-results {
+  min-height: 46px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.drawer-show-results:hover:not(:disabled) { background: var(--accent-dark); }
+.drawer-show-results:disabled { opacity: .65; cursor: wait; }
+.drawer-reset { min-height: 36px; background: transparent; border: 0; color: var(--text-muted); font: inherit; font-size: 13px; cursor: pointer; }
+.drawer-reset:hover:not(:disabled) { color: var(--accent-dark); }
+.drawer-reset:disabled { opacity: .45; cursor: default; }
+.filter-drawer::backdrop { background: rgba(23,21,18,.18); backdrop-filter: blur(1px); }
+
+/* Wide screens keep results visible while filters unfold beneath search. */
+.catalog-inline-filters {
+  margin: 0 0 18px;
+  padding: 20px 24px 12px;
+  background: var(--base-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  animation: inline-filters-enter .2s ease-out;
+}
+.catalog-inline-filters .filter-panel-inner { padding: 0; }
+.inline-filter-reset {
+  display: block;
+  margin: 12px 0 0 auto;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.inline-filter-reset:disabled { opacity: .4; cursor: default; }
+@keyframes inline-filters-enter {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .catalog-inline-filters { animation: none; } }
+
+/* Shorter search field, with filters anchored to the catalog edge. */
+.catalog-search .search-input { max-width: 640px; }
+.catalog-search .filter-toggle { margin-left: auto; }
+@media (max-width: 600px) {
+  .catalog-search .search-input { max-width: none; }
+}
+
+.catalog-search-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 640px;
+}
+.catalog-search-field .search-input {
+  display: block;
+  width: 100%;
+  border-radius: 999px;
+  padding-left: 42px;
+}
+.catalog-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+@media (max-width: 600px) { .catalog-search-field { max-width: none; } }
+@media (max-width: 480px) { .catalog-search-field { flex-basis: 100%; } }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+.catalog-inline-filters {
+  position: relative;
+  background: #f0ebdf;
+  padding-top: 30px;
+}
+.inline-filter-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+}
+.inline-filter-close:hover { background: var(--accent-soft); color: var(--accent-dark); }
+.filter-drawer { background: #f0ebdf; }
+
+.catalog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.catalog-pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color .18s ease;
+}
+.catalog-pagination button:hover:not(:disabled) { color: var(--text-dark); }
+.catalog-pagination button:disabled { opacity: .3; cursor: default; }
+.pagination-item { display: inline-flex; align-items: center; }
+.catalog-pagination .pagination-number { position: relative; }
+.catalog-pagination .pagination-number[aria-current="page"] { color: var(--accent-dark); }
+.pagination-number[aria-current="page"]::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: var(--accent);
+}
+.pagination-ellipsis { color: var(--text-muted); padding: 0 4px; }
+.catalog-pagination .pagination-arrow { margin: 0 6px; }
+
+/* Animate only the arriving catalog, never image geometry or layout. */
+.catalog-page-transition { animation: catalog-page-arrive 180ms ease-out; }
+.catalog-page-transition.is-loading { pointer-events: none; }
+@keyframes catalog-page-arrive {
+  from { opacity: .45; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .catalog-page-transition { animation: none; }
+}
+
+/* Quiet placeholders only for the initial catalog request. */
+.catalog-skeleton { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.skeleton-photo { width: 100%; aspect-ratio: 1; background: #e0d8c9; }
+.skeleton-caption { padding-top: 9px; }
+.skeleton-line { background: #e0d8c9; border-radius: 3px; }
+.skeleton-name { width: 48%; height: 18px; margin-bottom: 6px; }
+.skeleton-type { width: 66%; height: 12px; margin-bottom: 6px; }
+.skeleton-rarity { width: 30%; height: 12px; }
+
+/* One low-contrast, transform-only shimmer layer for the loading grid. */
+.catalog-page-transition.has-skeleton {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.catalog-page-transition.has-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(251,248,242,.16) 45%, rgba(251,248,242,.28) 50%, rgba(251,248,242,.16) 55%, transparent 70%);
+  transform: translateX(-100%);
+  animation: catalog-skeleton-wave 2.2s linear infinite;
+}
+@keyframes catalog-skeleton-wave {
+  to { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .catalog-page-transition.has-skeleton::after { display: none; animation: none; }
+}

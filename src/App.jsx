@@ -3,6 +3,7 @@ import CatalogPage from './pages/CatalogPage.jsx';
 import MineralPage from './pages/MineralPage.jsx';
 import ArticlesPage from './pages/ArticlesPage.jsx';
 import ArticlePage from './pages/ArticlePage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 import { useLang } from './i18n/LangContext.jsx';
 
 function LangSwitcher() {
@@ -46,7 +47,6 @@ export default function App() {
           </NavLink>
         </nav>
         <div className="site-header-right">
-          <span className="site-tag">{t('site_tag')}</span>
           <LangSwitcher />
         </div>
       </header>
@@ -56,6 +56,7 @@ export default function App() {
           <Route path="/minerals/:slug" element={<MineralPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:slug" element={<ArticlePage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
     </div>

@@ -20,14 +20,14 @@ test('localized links keep API order, direction, and catalog routes', () => {
   assert.deepEqual(ru.map(({ direction }) => direction), ['reverse', 'direct']);
 });
 
-test('missing translation falls back to the other name, then slug', () => {
+test('missing translation is explicitly marked', () => {
   const names = [
     { slug: 'one', name_ru: '  ', name_en: 'One', direction: 'direct' },
     { slug: 'two', name_ru: 'Два', name_en: '', direction: 'reverse' },
     { slug: 'three', name_ru: '', name_en: '', direction: 'direct' },
   ];
-  assert.deepEqual(relatedEntityLinks(names, 'ru', 'current').map(({ label }) => label), ['One', 'Два', 'three']);
-  assert.deepEqual(relatedEntityLinks(names, 'en', 'current').map(({ label }) => label), ['One', 'Два', 'three']);
+  assert.deepEqual(relatedEntityLinks(names, 'ru', 'current').map(({ label }) => label), ['one (перевод пока не готов)', 'Два', 'three (перевод пока не готов)']);
+  assert.deepEqual(relatedEntityLinks(names, 'en', 'current').map(({ label }) => label), ['One', 'two (translation pending)', 'three (translation pending)']);
 });
 
 test('empty, duplicate, unavailable, and self links never produce a block', () => {

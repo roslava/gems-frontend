@@ -6,13 +6,37 @@ const STORAGE_KEY = 'samotsvety_lang';
 // не входят — они выбираются хелперами pickI18n()/pickField() ниже прямо из ответа API.
 const STRINGS = {
   ru: {
+    pagination_label: 'Страницы каталога',
+    page_label: (number) => `Страница ${number}`,
+    close_filters: 'Закрыть фильтры',
+    reset_filters: 'Сбросить фильтры',
+    results_unavailable: 'Не удалось загрузить результаты',
+    show_results: (count) => {
+      const mod10 = count % 10, mod100 = count % 100;
+      const noun = mod10 === 1 && mod100 !== 11 ? 'камень' : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? 'камня' : 'камней';
+      return `Показать ${count} ${noun}`;
+    },
+    description_title: 'Описание',
+    characteristics_title: 'Характеристики',
+    contents_title: 'Содержание',
+    care_title: 'Уход и предосторожности',
+    composition_group: 'Состав и классификация',
+    physical_group: 'Физические свойства',
+    optical_group: 'Оптические свойства',
+
     nav_catalog: 'Каталог',
     nav_articles: 'Статьи',
     site_tag: 'тестовая витрина · данные из API',
 
-    catalog_title: 'Образцы в базе',
+    catalog_title: 'Каталог камней',
+    catalog_count: (count) => {
+      const mod10 = count % 10, mod100 = count % 100;
+      const noun = mod10 === 1 && mod100 !== 11 ? 'камень' : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? 'камня' : 'камней';
+      return `${count} ${noun} в каталоге`;
+    },
+    results_count: (count) => `Найдено: ${count}`,
     catalog_desc: 'Рабочая витрина для проверки наполнения — тянет данные напрямую из Samotsvety API.',
-    search_placeholder: 'Поиск по названию, формуле, lore…',
+    search_placeholder: 'Найти камень по названию или свойствам…',
     rarity_any: 'Любая редкость',
     rarity_common: 'Обычный',
     rarity_uncommon: 'Нечастый',
@@ -53,11 +77,12 @@ const STRINGS = {
     crystal_system: 'Кристаллическая система',
     crystal_habit: 'Форма кристаллов',
     hardness: 'Твёрдость',
-    density: 'Плотность',
+    density: 'Относительная плотность',
     luster: 'Блеск',
     transparency: 'Прозрачность',
     streak: 'Цвет черты',
     cleavage: 'Спайность',
+    cleavage_directions: 'направл.',
     fracture: 'Излом',
     tenacity: 'Вязкость',
     ima_status: 'Статус IMA',
@@ -78,6 +103,14 @@ const STRINGS = {
     gallery_open_alt: 'Открыть фото крупно',
     safety_title: 'Меры предосторожности',
     related_title: 'Связанные камни',
+    related_error: 'Не удалось загрузить связи:',
+    not_found: 'Карточка не найдена (404).',
+    sources_title: 'Источники',
+    lightbox_close: 'Закрыть',
+    page_not_found: 'Страница не найдена',
+    page_not_found_desc: 'Проверьте адрес или вернитесь в каталог.',
+    entity_mineral: 'Минерал', entity_rock: 'Горная порода', entity_gem_variety: 'Ювелирная разновидность', entity_organic: 'Органогенный материал',
+    mineral_class: 'Минеральный класс', chemical_class: 'Химический класс', silicate_subclass: 'Подкласс силикатов', mineral_family: 'Семейство минералов', catalog_family: 'Семейство каталога', hardness_note: 'Примечание к твёрдости',
 
     // Показывается вместо русского текста, если перевода на выбранный язык нет —
     // принципиально не откатываемся на другой язык молча.
@@ -101,13 +134,29 @@ const STRINGS = {
     related_gems_title: 'Связанные камни',
   },
   en: {
+    pagination_label: 'Catalog pages',
+    page_label: (number) => `Page ${number}`,
+    close_filters: 'Close filters',
+    reset_filters: 'Reset filters',
+    results_unavailable: 'Results could not be loaded',
+    show_results: (count) => `Show ${count} ${count === 1 ? 'stone' : 'stones'}`,
+    description_title: 'Description',
+    characteristics_title: 'Characteristics',
+    contents_title: 'Contents',
+    care_title: 'Care & precautions',
+    composition_group: 'Composition & classification',
+    physical_group: 'Physical properties',
+    optical_group: 'Optical properties',
+
     nav_catalog: 'Catalog',
     nav_articles: 'Articles',
     site_tag: 'test showcase · live API data',
 
-    catalog_title: 'Specimens in the database',
+    catalog_title: 'Stone catalog',
+    catalog_count: (count) => `${count} ${count === 1 ? 'stone' : 'stones'} in the catalog`,
+    results_count: (count) => `Found: ${count}`,
     catalog_desc: 'A working showcase for checking data population — pulls directly from the Samotsvety API.',
-    search_placeholder: 'Search by name, formula, lore…',
+    search_placeholder: 'Find a stone by name or properties…',
     rarity_any: 'Any rarity',
     rarity_common: 'Common',
     rarity_uncommon: 'Uncommon',
@@ -148,11 +197,12 @@ const STRINGS = {
     crystal_system: 'Crystal system',
     crystal_habit: 'Crystal habit',
     hardness: 'Hardness',
-    density: 'Density',
+    density: 'Specific gravity',
     luster: 'Luster',
     transparency: 'Transparency',
     streak: 'Streak',
     cleavage: 'Cleavage',
+    cleavage_directions: 'directions',
     fracture: 'Fracture',
     tenacity: 'Tenacity',
     ima_status: 'IMA status',
@@ -173,6 +223,14 @@ const STRINGS = {
     gallery_open_alt: 'Open full-size photo',
     safety_title: 'Safety notes',
     related_title: 'Related stones',
+    related_error: 'Failed to load related stones:',
+    not_found: 'Specimen not found (404).',
+    sources_title: 'Sources',
+    lightbox_close: 'Close',
+    page_not_found: 'Page not found',
+    page_not_found_desc: 'Check the address or return to the catalog.',
+    entity_mineral: 'Mineral', entity_rock: 'Rock', entity_gem_variety: 'Gem variety', entity_organic: 'Organic material',
+    mineral_class: 'Mineral class', chemical_class: 'Chemical class', silicate_subclass: 'Silicate subclass', mineral_family: 'Mineral family', catalog_family: 'Catalog family', hardness_note: 'Hardness note',
 
     not_translated: 'Translation pending',
     not_translated_full: 'This specimen has not been translated into English yet.',

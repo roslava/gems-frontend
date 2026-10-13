@@ -29,38 +29,26 @@ export default function ColorSwatchFilter({ available, value, onChange }) {
 
   return (
     <div className="color-filter">
-      <span className="color-filter-label">{t('color_title')}</span>
-      <div className="color-swatches">
-        <button
-          type="button"
-          className={`color-swatch color-swatch-all${value === '' ? ' active' : ''}`}
-          onClick={() => onChange('')}
-        >
-          <span className="color-swatch-gem" />
-          <span className="color-swatch-label">{t('color_any')}</span>
-        </button>
-
+      <span className="color-filter-label" id="color-palette-label">{t('color_title')}</span>
+      <div className="color-segment-strip" role="group" aria-labelledby="color-palette-label">
         {BASE_COLORS.map((item) => {
           const isAvailable = !availableSet || availableSet.has(item.value);
-          return (
-            <button
-              key={item.value}
-              type="button"
-              className={`color-swatch${value === item.value ? ' active' : ''}${
-                !isAvailable ? ' unavailable' : ''
-              }`}
-              onClick={() => isAvailable && onChange(value === item.value ? '' : item.value)}
-              disabled={!isAvailable}
-              title={t(`color_${item.value}`)}
-            >
-              <span
-                className={`color-swatch-gem${item.value === 'multicolor' ? ' multicolor' : ''}`}
-                style={swatchStyle(item)}
-              />
-              <span className="color-swatch-label">{t(`color_${item.value}`)}</span>
-            </button>
-          );
+          return <button
+            key={item.value}
+            type="button"
+            className={`color-segment${value === item.value ? ' active' : ''}`}
+            style={swatchStyle(item)}
+            disabled={!isAvailable}
+            title={t(`color_${item.value}`)}
+            aria-label={t(`color_${item.value}`)}
+            aria-pressed={value === item.value}
+            onClick={() => onChange(value === item.value ? '' : item.value)}
+          />;
         })}
+      </div>
+      <div className="color-palette-caption">
+        <span aria-live="polite">{value ? t(`color_${value}`) : t('color_any')}</span>
+        {value && <button type="button" className="color-reset" onClick={() => onChange('')}>{t('color_any')}</button>}
       </div>
     </div>
   );

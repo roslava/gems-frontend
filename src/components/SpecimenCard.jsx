@@ -1,61 +1,19 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useLang, pickI18n } from '../i18n/LangContext.jsx';
-
-function truncate(str, max = 60) {
-  if (!str) return str;
-  return str.length > max ? `${str.slice(0, max - 1)}…` : str;
-}
+import { useLang } from '../i18n/LangContext.jsx';
+import { imageUrl, localized } from '../gemV2.js';
 
 export default function SpecimenCard({ mineral }) {
   const { lang, t } = useLang();
-  const { slug, scientific = {}, i18n = {}, thumbnail_url, main_image_url } = mineral;
-  const data = pickI18n(i18n, lang);
-  const hardness = scientific.hardness || {};
-  const image = thumbnail_url || main_image_url;
-
-  return (
-    <Link to={`/minerals/${slug}`} className="specimen-card facet-card">
-<div className="specimen-photo">
-  {image ? (
-    <div className="specimen-photo-img" style={{ backgroundImage: `url(${image})` }} />
-  ) : (
-    t('no_photo')
-  )}
-</div>
-      <div className="specimen-body">
-        <div className="specimen-name-row">
-          <div className="specimen-name">{data?.name || slug}</div>
-        </div>
-        <div className="specimen-latin">{data?.mineral_group || (!data ? t('not_translated') : '—')}</div>
-        <div className="data-row">
-          <span>{t('hardness')}</span>
-          <span className="value">
-            {hardness.min ?? '?'}–{hardness.max ?? '?'}
-          </span>
-        </div>
-        <div className="data-row">
-          <span>{t('formula')}</span>
-          <span className="value" title={scientific.chemical_formula || ''}>
-            {truncate(scientific.chemical_formula) || '—'}
-          </span>
-        </div>
-        {scientific.rarity && (
-          <div className="rarity-row">
-            <span
-              className="rarity-dot"
-              style={{
-                background:
-                  scientific.rarity === 'rare' || scientific.rarity === 'very_rare'
-                    ? 'var(--accent)'
-                    : 'var(--text-muted-light)',
-              }}
-            />
-            <span className="rarity-label">
-              {t('rarity_label_prefix')} {t(`rarity_${scientific.rarity}`)}
-            </span>
-          </div>
-        )}
-      </div>
-    </Link>
-  );
+  const [failed, setFailed] = useState(false);
+  const data = localized(mineral, lang);
+  const scientific = mineral.scientific || {};
+  const image = imageUrl(mineral.images, mineral.images?.thumbnail) || imageUrl(mineral.images, mineral.images?.hero);
+  return <Link to={`/minerals/${mineral.slug}`} className="specimen-card collection-card">
+    <div className="specimen-photo">{image && !failed ? <img className="specimen-photo-img" src={image} alt={data?.name || mineral.slug} onError={() => setFailed(true)} /> : t('no_photo')}</div>
+    <div className="specimen-body"><div className="specimen-name-row"><div className="specimen-name" title={data?.name || mineral.slug}>{data?.name || mineral.slug}</div></div>
+      <div className="specimen-latin">{data ? t(`entity_${mineral.type}`) : t('not_translated')}</div>
+      {scientific.rarity && <div className="rarity-row"><span className={`rarity-label rarity-badge${['rare', 'very_rare'].includes(scientific.rarity) ? ' rarity-badge-accent' : ''}`}>{t(`rarity_${scientific.rarity}`)}</span></div>}
+    </div>
+  </Link>;
 }

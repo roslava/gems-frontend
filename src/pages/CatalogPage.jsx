@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getMinerals, searchMinerals, getFilters } from '../api.js';
+import { getGemPage } from '../api.js';
+import useDebouncedValue from '../hooks/useDebouncedValue.js';
 import SpecimenCard from '../components/SpecimenCard.jsx';
+import FilterDrawer from '../components/FilterDrawer.jsx';
 import ColorSwatchFilter from '../components/ColorSwatchFilter.jsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
@@ -10,20 +12,30 @@ const EN_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
 export default function CatalogPage() {
   const { lang, t } = useLang();
   const [minerals, setMinerals] = useState([]);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const [catalogRevision, setCatalogRevision] = useState(0);
   const [total, setTotal] = useState(0);
+  const [availableBaseColors, setAvailableBaseColors] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [query, setQuery] = useState('');
+  const searchQuery = useDebouncedValue(query.trim());
+  const searchPending = query.trim() !== searchQuery;
   const [rarity, setRarity] = useState('');
   const [baseColor, setBaseColor] = useState('');
-  const [availableBaseColors, setAvailableBaseColors] = useState(null);
-  const [russianOnly, setRussianOnly] = useState(false);
   const [letter, setLetter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mobileFilters, setMobileFilters] = useState(() => window.matchMedia('(max-width: 600px)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 600px)');
+    const update = () => setMobileFilters(media.matches);
+    media.addEventListener('change', update);
+  return () => media.removeEventListener('change', update);
+  }, []);
 
-  const activeFilterCount = [rarity, baseColor, russianOnly ? 'x' : ''].filter(Boolean).length;
+  const activeFilterCount = [rarity, baseColor].filter(Boolean).length;
 
   const ALPHABET = lang === 'en' ? EN_LETTERS : RU_LETTERS;
 
@@ -35,70 +47,125 @@ export default function CatalogPage() {
     { value: 'very_rare', label: t('rarity_very_rare') },
   ];
 
-  // base_colors языконезависимы, но грузим вместе с lang для единообразия
-  // с остальными вызовами getFilters — вреда нет, а код проще.
   useEffect(() => {
-    let cancelled = false;
-
-    getFilters({ lang })
-      .then((fv) => {
-        if (cancelled) return;
-        setAvailableBaseColors(fv.base_colors || []);
-      })
-      .catch(() => {
-        if (!cancelled) setAvailableBaseColors(null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lang]);
-
-  useEffect(() => {
-    let cancelled = false;
+    if (searchPending) return;
+    const controller = new AbortController();
     setLoading(true);
     setError(null);
+    getGemPage({ page, limit, lang, query: searchQuery, rarity, baseColor, letter, signal: controller.signal })
+      .then((result) => {
+        if (controller.signal.aborted) return;
+        setCatalogRevision((revision) => revision + 1);
+        setMinerals(result.data); setTotal(result.total); setAvailableBaseColors(result.base_colors);
+        if (result.page !== page) setPage(result.page);
+      })
+      .catch((err) => { if (!controller.signal.aborted) { setMinerals([]); setError(err.message); } })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [page, limit, lang, searchQuery, searchPending, rarity, baseColor, letter]);
 
-    const load = async () => {
-      try {
-        let result;
-        if (query.trim()) {
-          result = await searchMinerals(query.trim(), { lang });
-        } else {
-          result = await getMinerals({
-            lang,
-            page,
-            limit,
-            rarity: rarity || undefined,
-            base_color: baseColor || undefined,
-            russian_only: russianOnly || undefined,
-            letter: letter || undefined,
-          });
-        }
-        if (!cancelled) {
-          setMinerals(result.data || []);
-          setTotal(result.total ?? (result.data ? result.data.length : 0));
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, limit, rarity, baseColor, russianOnly, letter, query, lang]);
+  const items = minerals;
+  useEffect(() => {
+    if (!loading || error) {
+      setShowSkeleton(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSkeleton(true), 180);
+    return () => clearTimeout(timer);
+  }, [loading, error]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
+  const currentPage = page;
+  const goToPage = (nextPage) => {
+    if (nextPage === page) return;
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+
+  useEffect(() => { setLetter(''); }, [lang]);
+
+    const resetFilters = () => { setBaseColor(''); setRarity(''); setPage(1); };
+  const filterControls = (
+        <div className="filter-panel-inner catalog-filter-layout">
+          <ColorSwatchFilter
+            available={availableBaseColors}
+            value={baseColor}
+            onChange={(next) => {
+              setBaseColor(next);
+              setPage(1);
+            }}
+          />
+
+          <div className="rarity-filter">
+            <span className="color-filter-label" id="rarity-filter-label">{t('rarity')}</span>
+            <div className="rarity-options" role="group" aria-labelledby="rarity-filter-label">
+              {RARITIES.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`rarity-option${rarity === option.value ? ' active' : ''}`}
+                  aria-pressed={rarity === option.value}
+                  onClick={() => { setRarity(option.value); setPage(1); }}
+                >
+                  {option.value ? option.label : t('alphabet_all')}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+  );
 
   return (
-    <div className="section">
-      <span className="section-label">{t('nav_catalog')}</span>
-      <h1 className="section-title">{t('catalog_title')}</h1>
-      <p className="section-desc">{t('catalog_desc')}</p>
+    <div className="section catalog-section">
+      <h1 className="visually-hidden">{t('catalog_title')}</h1>
+
+      <div className="filters-row catalog-search">
+        <div className="catalog-search-field">
+          <svg className="catalog-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" />
+          </svg>
+        <input
+          className="search-input"
+          type="text"
+          aria-label={t('search_placeholder')}
+          placeholder={t('search_placeholder')}
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setPage(1);
+          }}
+        />
+        </div>
+        <button
+          type="button"
+          className={`filter-toggle${filtersOpen ? ' open' : ''}${activeFilterCount ? ' has-filters' : ''}`}
+          aria-expanded={filtersOpen}
+          aria-controls="catalog-filters"
+          onClick={() => setFiltersOpen((v) => !v)}
+        >
+          <svg className="filter-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 7h4m4 0h8M4 17h10m4 0h2" />
+            <circle cx="10" cy="7" r="2" /><circle cx="16" cy="17" r="2" />
+          </svg>
+          <span>{t(filtersOpen ? 'close_filters' : 'filters_toggle')}</span>
+          {activeFilterCount > 0 && <span className="count">· {activeFilterCount}</span>}
+          <svg className="chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m3 4.5 3 3 3-3" /></svg>
+        </button>
+      </div>
+
+      {filtersOpen && (mobileFilters
+        ? <FilterDrawer onClose={() => setFiltersOpen(false)} onReset={resetFilters}
+            busy={loading || searchPending || Boolean(error)} hasFilters={activeFilterCount > 0}
+            resultLabel={loading || searchPending ? t('loading') : error ? t('results_unavailable') : t('show_results', total)}>
+            {filterControls}
+          </FilterDrawer>
+        : <div id="catalog-filters" className="catalog-inline-filters">
+            <button type="button" className="inline-filter-close" title={t('close_filters')} aria-label={t('close_filters')} onClick={() => setFiltersOpen(false)}>✕</button>
+            {filterControls}
+            <button type="button" className="inline-filter-reset" disabled={!activeFilterCount} onClick={resetFilters}>{t('reset_filters')}</button>
+          </div>
+      )}
 
       <div className="alphabet-bar">
         <button
@@ -124,29 +191,9 @@ export default function CatalogPage() {
         ))}
       </div>
 
-      <div className="filters-row" style={{ marginBottom: 16 }}>
-        <input
-          className="search-input"
-          type="text"
-          placeholder={t('search_placeholder')}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-        />
-      </div>
+      <div className="filter-bar catalog-toolbar">
+        <span className="catalog-count" role="status">{!loading && !searchPending && !error ? t(query.trim() || letter || activeFilterCount ? 'results_count' : 'catalog_count', total) : t('loading')}</span>
 
-      <div className="filter-bar">
-        <button
-          type="button"
-          className={`filter-toggle${filtersOpen ? ' open' : ''}`}
-          onClick={() => setFiltersOpen((v) => !v)}
-        >
-          <span>{t('filters_toggle')}</span>
-          {activeFilterCount > 0 && <span className="count">{activeFilterCount}</span>}
-          <span className="chev">▾</span>
-        </button>
 
         {rarity && (
           <button type="button" className="active-chip" onClick={() => { setRarity(''); setPage(1); }}>
@@ -158,83 +205,55 @@ export default function CatalogPage() {
             {t(`color_${baseColor}`)} ✕
           </button>
         )}
-        {russianOnly && (
-          <button type="button" className="active-chip" onClick={() => { setRussianOnly(false); setPage(1); }}>
-            {t('russian_only')} ✕
-          </button>
-        )}
+
       </div>
 
-      <div className={`filter-panel${filtersOpen ? ' open' : ''}`}>
-        <div className="filter-panel-inner">
-          <ColorSwatchFilter
-            available={availableBaseColors}
-            value={baseColor}
-            onChange={(next) => {
-              setBaseColor(next);
-              setPage(1);
-            }}
-          />
 
-          <div className="filters-row" style={{ marginBottom: 0, marginTop: 20 }}>
-            <select
-              value={rarity}
-              onChange={(e) => {
-                setRarity(e.target.value);
-                setPage(1);
-              }}
-            >
-              {RARITIES.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-            <label className="checkbox-field">
-              <input
-                type="checkbox"
-                checked={russianOnly}
-                onChange={(e) => {
-                  setRussianOnly(e.target.checked);
-                  setPage(1);
-                }}
-              />
-              {t('russian_only')}
-            </label>
-          </div>
-        </div>
-      </div>
 
-      {loading && <p className="status-text">{t('loading')}</p>}
+      {(loading || searchPending) && items.length === 0 && !showSkeleton && <p className="status-text">{t('loading')}</p>}
       {error && (
         <p className="status-text status-error">
           {t('error_prefix')} {error}
         </p>
       )}
-      {!loading && !error && minerals.length === 0 && (
+      {!loading && !searchPending && !error && items.length === 0 && (
         <p className="status-text">{t('empty')}</p>
       )}
 
-      <div className="cards-grid">
-        {minerals.map((m) => (
+      <div key={catalogRevision} className={`cards-grid catalog-page-transition${loading || searchPending ? ' is-loading' : ''}${showSkeleton && loading ? ' has-skeleton' : ''}`} aria-busy={loading || searchPending} inert={loading || searchPending ? '' : undefined}>
+        {showSkeleton && loading && !error && Array.from({ length: limit }, (_, index) => (
+          <div className="catalog-skeleton" key={`skeleton-${index}`} aria-hidden="true">
+            <div className="skeleton-photo" />
+            <div className="skeleton-caption">
+              <div className="skeleton-line skeleton-name" />
+              <div className="skeleton-line skeleton-type" />
+              <div className="skeleton-line skeleton-rarity" />
+            </div>
+          </div>
+        ))}
+        {!(showSkeleton && loading) && !error && items.map((m) => (
           <SpecimenCard key={m.slug} mineral={m} />
         ))}
       </div>
 
-      {!query && totalPages > 1 && (
-        <div className="pagination">
-          <button className="btn btn-outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            {t('prev_page')}
+      {!loading && !searchPending && !error && totalPages > 1 && (
+        <nav className="catalog-pagination" aria-label={t('pagination_label')}>
+          <button type="button" className="pagination-arrow" disabled={page <= 1}
+            aria-label={t('prev_page')} onClick={() => goToPage(page - 1)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6" /></svg>
           </button>
-          <span className="page-info">{t('page_info', page, totalPages)}</span>
-          <button
-            className="btn btn-outline"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            {t('next_page')}
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((number) => totalPages <= 7 || number === 1 || number === totalPages || Math.abs(number - currentPage) <= 1)
+            .map((number, index, numbers) => <span className="pagination-item" key={number}>
+              {index > 0 && number - numbers[index - 1] > 1 && <span className="pagination-ellipsis" aria-hidden="true">…</span>}
+              <button type="button" className="pagination-number" aria-label={t('page_label', number)}
+                aria-current={number === currentPage ? 'page' : undefined} onClick={() => goToPage(number)}>{number}</button>
+            </span>)}
+          <button type="button" className="pagination-arrow" disabled={page >= totalPages}
+            aria-label={t('next_page')} onClick={() => goToPage(page + 1)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
           </button>
-        </div>
+        </nav>
       )}
     </div>
   );

@@ -10,7 +10,7 @@ export function relatedEntityLinks(entities, lang, currentSlug) {
     seen.add(slug);
     const ru = typeof entity.name_ru === 'string' ? entity.name_ru.trim() : '';
     const en = typeof entity.name_en === 'string' ? entity.name_en.trim() : '';
-    const label = (lang === 'en' ? en || ru : ru || en) || slug;
+    const label = (lang === 'en' ? en : ru) || `${slug} (${lang === 'en' ? 'translation pending' : 'перевод пока не готов'})`;
     return [{ ...entity, label, href: `/minerals/${encodeURIComponent(slug)}` }];
   });
 }
