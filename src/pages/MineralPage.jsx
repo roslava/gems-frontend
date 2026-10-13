@@ -42,7 +42,7 @@ export default function MineralPage() {
   }, [slug]);
 
   if (loading) return <div className="section"><p className="status-text">{t('loading')}</p></div>;
-  if (error) return <div className="section"><p className="status-text status-error">{error.status === 404 ? t('not_found') : `${t('mineral_load_error')} ${error.message}`}</p><Link className="btn btn-outline" to="/">{t('back_to_catalog')}</Link></div>;
+  if (error) return <div className="section"><p className="status-text status-error">{error.status === 404 ? t('not_found') : `${t('mineral_load_error')} ${error.message}`}</p><Link className="btn btn-outline" to="/catalog">{t('back_to_catalog')}</Link></div>;
   if (!mineral) return null;
 
   const s = mineral.scientific || {};
@@ -68,8 +68,9 @@ export default function MineralPage() {
     ['physical_group', ['hardness', 'density', 'crystal_system', 'crystal_habit', 'cleavage', 'fracture', 'tenacity']],
     ['optical_group', ['color_title', 'luster', 'transparency', 'streak', 'phenomena_title']],
   ];
-  const description = data?.color_description || data?.scientific_notes?.composition;
-  const intro = description?.match(/^[\s\S]*?[.!?](?:\s|$)/)?.[0]?.trim() || description;
+  const introduction = data?.lore || data?.color_description || data?.scientific_notes?.composition;
+  const sentences = introduction?.match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g);
+  const intro = sentences ? sentences.slice(0, data?.lore ? 2 : 1).join('').trim() : introduction;
   const navigation = [
     ['description', 'description_title', data?.color_description || data?.color?.length],
     ['characteristics', 'characteristics_title', facts.length || data?.scientific_notes?.composition || data?.scientific_notes?.hardness],
@@ -77,6 +78,7 @@ export default function MineralPage() {
     ['care', 'care_title', data?.safety_notes],
     ['localities', 'localities_title', mineral.localities?.length],
     ['history', 'lore_title', data?.lore],
+    ['esoteric', 'esoteric_title', data?.esoteric && Object.values(data.esoteric).some((value) => value?.length)],
   ].filter(([, , exists]) => exists);
   const requestedTab = location.hash.slice(1);
   const activeTab = navigation.some(([id]) => id === requestedTab) ? requestedTab : navigation[0]?.[0];
@@ -101,7 +103,7 @@ export default function MineralPage() {
     hidden: activeTab !== id, tabIndex: 0,
   });
   return <div className="section mineral-page mineral-editorial">
-    <Link className="btn btn-ghost" to="/">{t('back_to_catalog')}</Link>
+    <Link className="btn btn-ghost" to="/catalog">{t('back_to_catalog')}</Link>
     <div className="mineral-intro-grid">
       <div className="mineral-media">
         {hero && <Photo className="mineral-cover" src={hero} alt={data?.name || slug} />}
@@ -151,10 +153,10 @@ export default function MineralPage() {
     {mineral.localities?.length > 0 && <section {...panelProps('localities')} className="mineral-block"><h3>{t('localities_title')}</h3><ul className="locality-list">{mineral.localities.map((loc, i) => { const place = [pickField(loc,'country',lang),pickField(loc,'region',lang),pickField(loc,'locality',lang)].filter(Boolean).join(', '); const desc = pickField(loc,'description',lang); return <li key={i}><strong>{place || t('not_translated')}</strong>{loc.country_code === 'RU' && <span className="chip chip-active" style={{ marginLeft: 8 }}>{t('russia_badge')}</span>}{desc && <p className="locality-desc">{desc}</p>}</li>; })}</ul></section>}
 
       {data?.lore && <section {...panelProps('history')} className="mineral-block"><h2>{t('lore_title')}</h2><p>{data.lore}</p></section>}
-      {data?.esoteric && Object.values(data.esoteric).some((value) => value?.length) && <details className="mineral-block mineral-esoteric" key={slug + lang}><summary>{t('esoteric_title')}</summary>
+      {data?.esoteric && Object.values(data.esoteric).some((value) => value?.length) && <section {...panelProps('esoteric')} className="mineral-block mineral-esoteric"><h2>{t('esoteric_title')}</h2>
         {[['esoteric_properties','metaphysical_properties'],['esoteric_chakras','chakras'],['esoteric_zodiac','zodiac']].map(([label, field]) => data.esoteric[field]?.length > 0 && <p key={field}><strong>{t(label)}</strong> {data.esoteric[field].join(', ')}</p>)}
         {['healing_interpretation','energy_notes','ritual_uses'].map((field) => data.esoteric[field] && <p key={field}>{data.esoteric[field]}</p>)}
-      </details>}
+      </section>}
     {relatedError && <p className="status-text status-error">{t('related_error')} {relatedError}</p>}
     {linked.length > 0 && <div className="mineral-block"><h3>{t('related_title')}</h3><div className="row">{linked.map((entity) => <Link key={entity.slug} to={entity.href} className="chip chip-active related-chip">{entity.label}</Link>)}</div></div>}
     {mineral.sources?.length > 0 && <div className="mineral-block"><h3>{t('sources_title')}</h3><ul>{mineral.sources.map((source, i) => <li key={i}>{source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title || source.url}</a> : source.title}{source.author && ` — ${source.author}`}</li>)}</ul></div>}

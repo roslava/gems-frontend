@@ -1,8 +1,10 @@
 import { Routes, Route, Link, NavLink } from 'react-router-dom';
+import HomePage from './pages/HomePage.jsx';
 import CatalogPage from './pages/CatalogPage.jsx';
 import MineralPage from './pages/MineralPage.jsx';
 import ArticlesPage from './pages/ArticlesPage.jsx';
 import ArticlePage from './pages/ArticlePage.jsx';
+import Footer from './components/Footer.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import { useLang } from './i18n/LangContext.jsx';
 
@@ -40,6 +42,9 @@ export default function App() {
         </Link>
         <nav className="site-nav">
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : undefined)}>
+            {t('nav_home')}
+          </NavLink>
+          <NavLink to="/catalog" className={({ isActive }) => (isActive ? 'active' : undefined)}>
             {t('nav_catalog')}
           </NavLink>
           <NavLink to="/articles" className={({ isActive }) => (isActive ? 'active' : undefined)}>
@@ -52,13 +57,15 @@ export default function App() {
       </header>
       <main>
         <Routes>
-          <Route path="/" element={<CatalogPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/minerals/:slug" element={<MineralPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:slug" element={<ArticlePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

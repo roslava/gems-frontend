@@ -1674,3 +1674,80 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .catalog-page-transition.has-skeleton::after { display: none; animation: none; }
 }
+
+/* Shared editorial footer with room for future public pages. */
+.app { min-height: 100dvh; display: flex; flex-direction: column; }
+.app > main { flex: 1; }
+.site-footer { border-top: 1px solid var(--border); padding: 32px; }
+.footer-content {
+  max-width: 1536px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.footer-logo { font-size: 18px; font-weight: 500; }
+.site-footer h2 { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; margin: 0 0 14px; }
+.site-footer p, .site-footer li { font-size: 12px; line-height: 1.8; color: var(--text-muted); }
+.footer-brand p { margin-top: 10px; }
+.footer-navigation ul { list-style: none; margin: 0; padding: 0; }
+.footer-navigation li + li { margin-top: 6px; }
+.site-footer a:hover { color: var(--accent-dark); }
+@media (max-width: 600px) {
+  .site-footer { padding: 28px 20px; }
+  .footer-content { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+
+/* Entity pages share the catalog's broad, quiet editorial language. */
+.mineral-editorial { max-width: 1600px; padding: 28px 32px 56px; }
+.mineral-editorial > .btn-ghost { padding: 0; margin-bottom: 24px; font-size: 13px; }
+.mineral-intro-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 40px; }
+.mineral-cover { clip-path: none; }
+.mineral-thumbnails { gap: 10px; margin-top: 10px; }
+.mineral-thumbnails .gallery-thumb { border-radius: 0; background: transparent; }
+.mineral-summary .section-label { font-family: 'Inter',sans-serif; text-transform: none; letter-spacing: normal; color: var(--text-muted); font-size: 13px; }
+.mineral-summary .section-title { font-family: 'Inter',sans-serif; font-weight: 500; font-size: clamp(30px,3vw,44px); line-height: 1.2; }
+.mineral-lead { font-size: 17px; }
+.mineral-reading { max-width: 100%; }
+.mineral-editorial .mineral-block h2,
+.mineral-editorial .mineral-block h3,
+.mineral-editorial .mineral-esoteric summary { font-family: 'Inter',sans-serif; font-weight: 500; }
+.mineral-editorial .mineral-block h2 { font-size: 22px; }
+.mineral-editorial .mineral-block h3 { font-size: 16px; }
+.mineral-fact-groups { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px; }
+.mineral-fact-group { background: transparent; border-radius: 0; padding: 0; }
+.mineral-editorial .mineral-care { background: transparent; padding: 0 0 0 20px; border-left: 2px solid var(--accent); border-radius: 0; }
+.mineral-editorial .related-chip { background: transparent; padding: 5px 0; border-radius: 0; color: var(--text-muted); }
+.mineral-editorial .related-chip:hover { color: var(--accent-dark); }
+.mineral-editorial .mineral-esoteric summary { font-size: 18px; }
+.mineral-tabs [role="tab"] { border-bottom-width: 1px; }
+@media(max-width:1000px) { .mineral-fact-groups { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:720px) {
+ .mineral-editorial { padding: 24px 20px 48px; }
+ .mineral-intro-grid, .mineral-fact-groups { grid-template-columns: 1fr; gap: 24px; }
+}
+
+.home-hero-image {
+  display: block;
+  width: 100%;
+  height: min(78vh, 900px);
+  min-height: 400px;
+  object-fit: cover;
+  object-position: center;
+}
+@media(max-width:600px) {
+  .home-hero-image { height: 65vh; min-height: 360px; }
+}
+
+.home-hero-carousel { position: relative; height: min(78vh,900px); min-height: 400px; overflow: hidden; background: #171b21; }
+.home-hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
+.home-hero-slide.active { opacity: 1; }
+.home-hero-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 24px; background: rgba(0,0,0,.3); }
+.home-hero-controls button { width: 36px; height: 36px; border: 0; background: transparent; color: white; cursor: pointer; position: relative; }
+.home-hero-dot::after { content: ''; position: absolute; width: 7px; height: 7px; top: 50%; left: 50%; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(255,255,255,.45); }
+.home-hero-dot.active::after { background: #fff; }
+.home-hero-controls button:disabled { opacity: .3; cursor: default; }
+@media(max-width:600px) { .home-hero-carousel { height: 65vh; min-height: 360px; } }
+@media(prefers-reduced-motion:reduce) { .home-hero-slide { transition: none; } }
