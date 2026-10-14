@@ -5,7 +5,7 @@ import ArticleCard from '../components/ArticleCard.jsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
 export default function ArticlesPage() {
-  const { lang, t } = useLang();
+  const { t } = useLang();
   const [posts, setPosts] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -28,9 +28,9 @@ export default function ArticlesPage() {
       try {
         let result;
         if (searchQuery) {
-          result = await searchPosts(searchQuery, { lang, signal: controller.signal });
+          result = await searchPosts(searchQuery, { signal: controller.signal });
         } else {
-          result = await getPosts({ lang, page, limit, signal: controller.signal });
+          result = await getPosts({ page, limit, signal: controller.signal });
         }
         if (!controller.signal.aborted) {
           setPosts(result.data || []);
@@ -47,22 +47,23 @@ export default function ArticlesPage() {
     return () => {
       controller.abort();
     };
-  }, [page, limit, searchQuery, searchPending, lang]);
-
-  useEffect(() => setPage(1), [lang]);
+  }, [page, limit, searchQuery, searchPending]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="section">
-      <span className="section-label">{t('nav_articles')}</span>
-      <h1 className="section-title">{t('articles_title')}</h1>
-      <p className="section-desc">{t('articles_desc')}</p>
+    <div className="section catalog-section articles-section">
+      <h1 className="visually-hidden">{t('articles_title')}</h1>
 
-      <div className="filters-row">
+      <div className="filters-row catalog-search">
+        <div className="catalog-search-field">
+          <svg className="catalog-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" />
+          </svg>
         <input
           className="search-input"
           type="text"
+          aria-label={t('search_articles_placeholder')}
           placeholder={t('search_articles_placeholder')}
           value={query}
           onChange={(e) => {
@@ -70,6 +71,7 @@ export default function ArticlesPage() {
             setPage(1);
           }}
         />
+        </div>
       </div>
 
       {(loading || searchPending) && <p className="status-text">{t('loading')}</p>}

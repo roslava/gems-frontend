@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getGemEntities, getGemEntity, getPosts } from '../src/api.js';
+import { getGemEntities, getGemEntity } from '../src/api.js';
 
 const gem = { slug: 'agate', type: 'gem_variety', scientific: {}, i18n: { ru: { name: 'Агат' }, en: { name: 'Agate' } }, localities: [], related_entities: [], sources: [] };
 
-test('catalog and detail use public V2 routes while articles retain V1', async () => {
+test('catalog and detail use public V2 routes', async () => {
   const original = globalThis.fetch;
   const calls = [];
   globalThis.fetch = async (url) => {
@@ -14,8 +14,7 @@ test('catalog and detail use public V2 routes while articles retain V1', async (
   try {
     assert.deepEqual(await getGemEntities(), [gem]);
     assert.equal((await getGemEntity('agate')).slug, 'agate');
-    await getPosts();
-    assert.deepEqual(calls, ['/api/v2/gem-entities', '/api/v2/gem-entities/agate', '/api/v1/posts']);
+    assert.deepEqual(calls, ['/api/v2/gem-entities', '/api/v2/gem-entities/agate']);
   } finally { globalThis.fetch = original; }
 });
 

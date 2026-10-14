@@ -4,6 +4,7 @@ import CatalogPage from './pages/CatalogPage.jsx';
 import MineralPage from './pages/MineralPage.jsx';
 import ArticlesPage from './pages/ArticlesPage.jsx';
 import ArticlePage from './pages/ArticlePage.jsx';
+import ThemeSwitcher from './components/ThemeSwitcher.jsx';
 import Footer from './components/Footer.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import { useLang } from './i18n/LangContext.jsx';
@@ -52,6 +53,7 @@ export default function App() {
           </NavLink>
         </nav>
         <div className="site-header-right">
+          <ThemeSwitcher />
           <LangSwitcher />
         </div>
       </header>

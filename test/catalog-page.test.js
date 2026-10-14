@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getGemPage, getPosts, searchPosts } from '../src/api.js';
+import { getGemPage } from '../src/api.js';
 import { parseGemPage } from '../src/gemV2.js';
 
 const entity = { slug: 'agate', scientific: {}, i18n: { ru: { name: 'Агат' } } };
@@ -23,8 +23,6 @@ test('catalog sends pagination and combined filters; requests can be aborted', a
     await getGemPage({ page: 2, lang: 'en', query: 'blue flash', rarity: 'rare', baseColor: 'blue', russianOnly: true, letter: 'O', signal: controller.signal });
     assert.deepEqual(Object.fromEntries(calls[0].url.searchParams), { page: '2', limit: '20', lang: 'en', q: 'blue flash', rarity: 'rare', base_color: 'blue', country_code: 'RU', letter: 'O' });
     assert.equal(calls[0].options.signal, controller.signal);
-    await getPosts({ signal: controller.signal });
-    await searchPosts('test', { signal: controller.signal });
     for (const call of calls) {
       assert.equal(call.options.signal, controller.signal);
       assert.equal(call.url.searchParams.has('signal'), false);

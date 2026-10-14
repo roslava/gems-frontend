@@ -35,16 +35,21 @@ export async function getRelatedGemEntities(slug, { signal } = {}) {
   return result.data;
 }
 
-// Articles retain their independent V1 contract.
-export function getPosts({ lang = 'ru', page = 1, limit = 20, signal, ...filters } = {}) {
-  return request('/posts', { lang, page, limit, published: true, ...filters }, { signal });
-}
-export function getPost(slug, { lang = 'ru' } = {}) { return request(`/posts/${encodeURIComponent(slug)}`, { lang }); }
-export function searchPosts(q, { lang = 'ru', limit = 20, signal } = {}) { return request('/search/posts', { q, lang, limit }, { signal }); }
-
 export async function getGemPage({ page = 1, limit = 20, lang = 'ru', query = '', rarity = '', baseColor = '', russianOnly = false, letter = '', signal } = {}) {
   return parseGemPage(await request('/gem-entities', {
     page, limit, lang, q: query, rarity, base_color: baseColor,
     country_code: russianOnly ? 'RU' : '', letter,
   }, { version: 'v2', signal }));
+}
+
+export function getPosts({ lang = 'ru', page = 1, limit = 20, signal, ...filters } = {}) {
+  return request('/posts', { lang, page, limit, ...filters, published: true }, { signal });
+}
+
+export function getPost(slug, { lang = 'ru', signal } = {}) {
+  return request(`/posts/${encodeURIComponent(slug)}`, { lang }, { signal });
+}
+
+export function searchPosts(q, { lang = 'ru', limit = 20, signal } = {}) {
+  return request('/search/posts', { q, lang, limit }, { signal });
 }

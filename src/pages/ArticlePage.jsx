@@ -1,22 +1,47 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+import { Link, useParams } from 'react-router-dom';
 import { getPost } from '../api.js';
-import BlockRenderer from '../components/BlockRenderer.jsx';
-import { useLang, pickI18n } from '../i18n/LangContext.jsx';
+import { articleSlides, articleTranslation } from '../articleV2.js';
+import { renderArticleMarkdown } from '../articleMarkdown.js';
+import ArticleSlider from '../components/ArticleSlider.jsx';
+import { pickI18n, useLang } from '../i18n/LangContext.jsx';
 
-function formatDate(iso, locale) {
-  if (!iso) return null;
-  try {
-    return new Date(iso).toLocaleDateString(locale, {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch {
-    return null;
-  }
+export function ArticleAuthor({ name, avatarUrl }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  if (!name) return null;
+  return (
+    <footer className="article-v2-author">
+      {avatarUrl && !imageFailed && <img src={avatarUrl} alt="" onError={() => setImageFailed(true)} />}
+      <span>{name}</span>
+    </footer>
+  );
+}
+
+export function ArticleBody({ post, data, lang, contentHtml }) {
+  return (
+    <article className="section article-v2-page">
+      <ArticleSlider key={post.slug} slides={articleSlides(post)} lang={lang} />
+      <div className="article-v2-copy">
+        <h1>{data.title}</h1>
+        <p className="article-v2-lead">{data.excerpt}</p>
+        <div className="article-v2-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        <ArticleAuthor key={post.slug} name={post.author} avatarUrl={post.i18n?.media?.author_avatar_url} />
+      </div>
+    </article>
+  );
+}
+
+export function ArticleFeedback({ kind, error, t }) {
+  const message = kind === 'loading' ? t('loading')
+    : kind === 'not_found' ? t('article_not_found')
+      : kind === 'translation' ? t('not_translated')
+        : t('article_load_error') + ' ' + (error?.message || '');
+  return (
+    <div className="section">
+      <p className={'status-text' + (kind === 'error' ? ' status-error' : '')}>{message}</p>
+      {kind !== 'loading' && <Link to="/articles">{t('back_to_articles')}</Link>}
+    </div>
+  );
 }
 
 export default function ArticlePage() {
@@ -27,127 +52,24 @@ export default function ArticlePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
+    setPost(null);
     setLoading(true);
     setError(null);
+    getPost(slug, { signal: controller.signal })
+      .then((data) => { if (!controller.signal.aborted) setPost(data); })
+      .catch((err) => { if (!controller.signal.aborted) setError(err); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [slug]);
 
-    getPost(slug, { lang })
-      .then((data) => {
-        if (!cancelled) setPost(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+  const data = articleTranslation(post ? pickI18n(post.i18n, lang) : null);
+  const contentHtml = useMemo(() => renderArticleMarkdown(data?.content), [data?.content]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [slug, lang]);
+  if (loading) return <ArticleFeedback kind="loading" t={t} />;
+  if (error?.status === 404 || !post && !error) return <ArticleFeedback kind="not_found" t={t} />;
+  if (error) return <ArticleFeedback kind="error" error={error} t={t} />;
+  if (!data) return <ArticleFeedback kind="translation" t={t} />;
 
-  const data = post ? pickI18n(post.i18n, lang) : {};
-
-  const contentHtml = useMemo(() => {
-    if (!data.content) return '';
-    return DOMPurify.sanitize(marked.parse(data.content));
-  }, [data.content]);
-
-  if (loading) {
-    return (
-      <div className="section">
-        <p className="status-text">{t('loading')}</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="section">
-        <p className="status-text status-error">
-          {t('article_load_error')} {error}
-        </p>
-        <Link className="btn btn-outline" to="/articles">
-          {t('back_to_articles')}
-        </Link>
-      </div>
-    );
-  }
-
-  if (!post) return null;
-
-  const {
-    cover_image: coverImage,
-    published_at: publishedAt,
-    author,
-    tags = [],
-    gem_slugs: gemSlugs = [],
-  } = post;
-
-  const date = formatDate(publishedAt, lang === 'en' ? 'en-US' : 'ru-RU');
-  const resolvedCover = data?.cover_image || coverImage;
-
-  return (
-    <div className="section article-page">
-      <Link className="btn btn-ghost" to="/articles">
-        {t('back_to_articles')}
-      </Link>
-
-      <div className="mineral-header">
-        <div>
-          <span className="section-label">{t('nav_articles')}</span>
-          <h1 className="section-title">{data.title}</h1>
-          {(date || author) && (
-            <p className="section-desc article-meta">
-              {date}
-              {date && author ? ' · ' : ''}
-              {author}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {resolvedCover && <img className="mineral-hero-image" src={resolvedCover} alt={data.title} />}
-
-      {data.excerpt && <p className="article-excerpt article-lead">{data.excerpt}</p>}
-
-      {post.content_blocks && post.content_blocks.length > 0 ? (
-        <BlockRenderer blocks={post.content_blocks} lang={lang} />
-      ) : (
-        contentHtml && (
-          <div
-            className="mineral-block article-content"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
-        )
-      )}
-
-      {tags.length > 0 && (
-        <div className="mineral-block">
-          <h3>{t('tags_title')}</h3>
-          <div className="row">
-            {tags.map((tag) => (
-              <span key={tag} className="chip chip-active">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {gemSlugs.length > 0 && (
-        <div className="mineral-block">
-          <h3>{t('related_gems_title')}</h3>
-          <div className="row">
-            {gemSlugs.map((relSlug) => (
-              <Link key={relSlug} to={`/minerals/${relSlug}`} className="chip chip-active">
-                {relSlug}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return <ArticleBody post={post} data={data} lang={lang} contentHtml={contentHtml} />;
 }

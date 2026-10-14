@@ -6,6 +6,10 @@ const STORAGE_KEY = 'samotsvety_lang';
 // не входят — они выбираются хелперами pickI18n()/pickField() ниже прямо из ответа API.
 const STRINGS = {
   ru: {
+    articles_empty: 'Статьи скоро появятся.',
+    articles_no_matches: 'По вашему запросу статьи не найдены.',
+    articles_language_empty: 'На этом языке пока нет статей.',
+    article_not_found: 'Статья не найдена',
     home_sea_alt: 'Морской берег с галькой и оранжево-красным сердоликом среди камней.',
     home_ural_alt: 'Южный Урал в ясный день. На старом рюкзаке из грубой ткани цвета хаки лежит сросток желтоватых кристаллов с еловой веточкой.',
     home_tanzania_alt: 'Ночная Танзания: звёздное небо, костёр и старый Defender. На камне в переднем плане лежат сине-фиолетовые танзаниты.',
@@ -72,6 +76,9 @@ const STRINGS = {
     russian_only: 'Только российские месторождения',
     filters_toggle: 'Фильтры',
     alphabet_all: 'Все',
+    initial_letter: 'Начальная буква',
+    letter_filter: (letter) => `Буква: ${letter}`,
+    remove_letter_filter: (letter) => `Снять фильтр по букве ${letter}`,
     loading: 'Загрузка…',
     error_prefix: 'Не удалось получить данные:',
     empty: 'Ничего не найдено — база пуста или фильтр слишком строгий.',
@@ -130,7 +137,7 @@ const STRINGS = {
     not_translated_full: 'Для этого образца пока нет перевода на английский язык.',
 
     articles_title: 'Блог и гиды о камнях',
-    articles_desc: 'Истории, гиды по огранке и эзотерические заметки — тянутся напрямую из Samotsvety API.',
+    articles_desc: 'Истории и гиды о камнях.',
     search_articles_placeholder: 'Поиск по статьям…',
     type_any: 'Все типы',
     post_type_blog: 'Блог',
@@ -146,6 +153,10 @@ const STRINGS = {
     related_gems_title: 'Связанные камни',
   },
   en: {
+    articles_empty: 'Articles are coming soon.',
+    articles_no_matches: 'No articles match your search.',
+    articles_language_empty: 'No articles are available in this language yet.',
+    article_not_found: 'Article not found',
     home_sea_alt: 'A pebble seashore with an orange-red carnelian among the stones.',
     home_ural_alt: 'The Southern Ural mountains on a clear day. A pale yellow crystal cluster and a spruce twig rest on a vintage khaki canvas backpack.',
     home_tanzania_alt: 'Tanzania at night: a starry sky, campfire and classic Defender. Blue-violet tanzanite crystals rest on a foreground rock.',
@@ -204,6 +215,9 @@ const STRINGS = {
     russian_only: 'Russian localities only',
     filters_toggle: 'Filters',
     alphabet_all: 'All',
+    initial_letter: 'Initial letter',
+    letter_filter: (letter) => `Letter: ${letter}`,
+    remove_letter_filter: (letter) => `Remove letter filter ${letter}`,
     loading: 'Loading…',
     error_prefix: 'Failed to load data:',
     empty: 'Nothing found — the database is empty or the filter is too strict.',
@@ -260,7 +274,7 @@ const STRINGS = {
     not_translated_full: 'This specimen has not been translated into English yet.',
 
     articles_title: 'Blog & gem guides',
-    articles_desc: 'Stories, cutting guides, and esoteric notes — pulled directly from the Samotsvety API.',
+    articles_desc: 'Stories and guides about stones.',
     search_articles_placeholder: 'Search articles…',
     type_any: 'All types',
     post_type_blog: 'Blog',

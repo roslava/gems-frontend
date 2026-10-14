@@ -35,7 +35,7 @@ export default function CatalogPage() {
   return () => media.removeEventListener('change', update);
   }, []);
 
-  const activeFilterCount = [rarity, baseColor].filter(Boolean).length;
+  const activeFilterCount = [rarity, baseColor, letter].filter(Boolean).length;
 
   const ALPHABET = lang === 'en' ? EN_LETTERS : RU_LETTERS;
 
@@ -85,7 +85,7 @@ export default function CatalogPage() {
 
   useEffect(() => { setLetter(''); }, [lang]);
 
-    const resetFilters = () => { setBaseColor(''); setRarity(''); setPage(1); };
+    const resetFilters = () => { setBaseColor(''); setRarity(''); setLetter(''); setPage(1); };
   const filterControls = (
         <div className="filter-panel-inner catalog-filter-layout">
           <ColorSwatchFilter
@@ -113,6 +113,36 @@ export default function CatalogPage() {
               ))}
             </div>
           </div>
+          <div className="letter-filter">
+            <span className="color-filter-label" id="letter-filter-label">{t('initial_letter')}</span>
+            <div className="alphabet-bar" role="group" aria-labelledby="letter-filter-label">
+        <button
+          type="button"
+          className={`alphabet-btn${letter === '' ? ' active' : ''}`}
+          aria-pressed={letter === ''}
+          onClick={() => {
+            setLetter('');
+            setPage(1);
+          }}
+        >
+          {t('alphabet_all')}
+        </button>
+        {ALPHABET.map((l) => (
+          <button
+            key={l}
+            type="button"
+            aria-pressed={letter === l}
+            className={`alphabet-btn${letter === l ? ' active' : ''}`}
+            onClick={() => {
+              setLetter((prev) => (prev === l ? '' : l));
+              setPage(1);
+            }}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+          </div>
         </div>
   );
 
@@ -121,6 +151,7 @@ export default function CatalogPage() {
       <h1 className="visually-hidden">{t('catalog_title')}</h1>
 
       <div className="filters-row catalog-search">
+        <span className="catalog-count" role="status">{!loading && !searchPending && !error ? t(query.trim() || letter || activeFilterCount ? 'results_count' : 'catalog_count', total) : t('loading')}</span>
         <div className="catalog-search-field">
           <svg className="catalog-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
             <circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" />
@@ -167,34 +198,15 @@ export default function CatalogPage() {
           </div>
       )}
 
-      <div className="alphabet-bar">
-        <button
-          className={`alphabet-btn${letter === '' ? ' active' : ''}`}
-          onClick={() => {
-            setLetter('');
-            setPage(1);
-          }}
-        >
-          {t('alphabet_all')}
-        </button>
-        {ALPHABET.map((l) => (
-          <button
-            key={l}
-            className={`alphabet-btn${letter === l ? ' active' : ''}`}
-            onClick={() => {
-              setLetter((prev) => (prev === l ? '' : l));
-              setPage(1);
-            }}
-          >
-            {l}
+
+      <div className="filter-bar catalog-toolbar" hidden={!activeFilterCount}>
+
+
+        {letter && (
+          <button type="button" className="active-chip" aria-label={t('remove_letter_filter', letter)} onClick={() => { setLetter(''); setPage(1); }}>
+            {t('letter_filter', letter)} <span aria-hidden="true">✕</span>
           </button>
-        ))}
-      </div>
-
-      <div className="filter-bar catalog-toolbar">
-        <span className="catalog-count" role="status">{!loading && !searchPending && !error ? t(query.trim() || letter || activeFilterCount ? 'results_count' : 'catalog_count', total) : t('loading')}</span>
-
-
+        )}
         {rarity && (
           <button type="button" className="active-chip" onClick={() => { setRarity(''); setPage(1); }}>
             {RARITIES.find((r) => r.value === rarity)?.label} ✕
