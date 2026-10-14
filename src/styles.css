@@ -1744,15 +1744,35 @@ a {
   .home-hero-image { height: 65vh; min-height: 360px; }
 }
 
-.home-hero-carousel { position: relative; height: min(78vh,900px); min-height: 400px; overflow: hidden; background: #171b21; }
+/* The slideshow container clips every layer to the same responsive frame. */
+.home-page {
+  --hero-gutter: 32px;
+  --hero-radius: clamp(28px, 3.2vw, 64px);
+  padding: var(--hero-gutter);
+}
+.home-hero-carousel {
+  position: relative;
+  height: min(78svh, 900px);
+  min-height: 400px;
+  overflow: hidden;
+  border-radius: var(--hero-radius);
+  isolation: isolate;
+  background: transparent;
+}
 .home-hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
 .home-hero-slide.active { opacity: 1; }
-.home-hero-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 24px; background: rgba(0,0,0,.3); }
-.home-hero-controls button { width: 36px; height: 36px; border: 0; background: transparent; color: white; cursor: pointer; position: relative; }
-.home-hero-dot::after { content: ''; position: absolute; width: 7px; height: 7px; top: 50%; left: 50%; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(255,255,255,.45); }
-.home-hero-dot.active::after { background: #fff; }
+.home-hero-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 2px; padding: 4px 8px; border-radius: 999px; background: var(--base); }
+.home-hero-controls button { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text-dark); cursor: pointer; position: relative; }
+.home-hero-dot::after { content: ''; position: absolute; width: 7px; height: 7px; top: 50%; left: 50%; transform: translate(-50%,-50%); border-radius: 999px; background: var(--text-muted); transition: width .2s ease, background .2s ease; }
+.home-hero-dot.active::after { width: 20px; background: var(--text-dark); }
+.home-hero-controls button:hover:not(:disabled) { background: color-mix(in srgb, var(--text-dark) 8%, var(--base)); }
+.home-hero-controls .home-hero-pause { margin-left: 4px; }
+@media (prefers-reduced-motion: reduce) { .home-hero-dot::after { transition: none; } }
 .home-hero-controls button:disabled { opacity: .3; cursor: default; }
-@media(max-width:600px) { .home-hero-carousel { height: 65vh; min-height: 360px; } }
+@media (max-width: 600px) {
+  .home-page { --hero-gutter: 16px; --hero-radius: 24px; padding: var(--hero-gutter); }
+  .home-hero-carousel { height: 65svh; min-height: 360px; }
+}
 @media(prefers-reduced-motion:reduce) { .home-hero-slide { transition: none; } }
 
 .articles-section, .local-article { max-width: 1600px; }
