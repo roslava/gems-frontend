@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import HeroTitle from '../components/HeroTitle.tsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
 export default function HomePage() {
@@ -34,13 +35,13 @@ export default function HomePage() {
     };
   }, [paused, secondReady, thirdReady, fourthReady]);
   return <div className="home-page">
-    <h1 className="visually-hidden">{t('nav_home')}</h1>
     <section className="home-hero-carousel" aria-label={t('home_gallery')}>
       {slides.map((slide, index) => <img key={slide.src}
         className={`home-hero-slide${active === index ? ' active' : ''}`}
         src={slide.src} alt={slide.alt} aria-hidden={active !== index}
-        fetchPriority={index === 0 ? 'high' : 'low'}
+        fetchpriority={index === 0 ? 'high' : 'low'}
         onLoad={() => { if (index === 1) setSecondReady(true); if (index === 2) setThirdReady(true); if (index === 3) setFourthReady(true); }} />)}
+      <HeroTitle paused={paused} />
       <div className="home-hero-controls">
         {slides.map((_, index) => <button key={index} type="button"
           className={`home-hero-dot${active === index ? ' active' : ''}`}

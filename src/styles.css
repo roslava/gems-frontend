@@ -1937,3 +1937,31 @@ a {
 @media (max-width: 600px) {
   .catalog-section .catalog-search { margin-bottom: 24px; }
 }
+
+
+@tailwind utilities;
+
+/* Hero lettering is isolated from the slideshow and its controls. */
+.hero-title-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  padding: 32px;
+}
+.hero-title {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(44px, 9vw, 148px);
+  line-height: 1.12;
+}
+.hero-title-scanner { font-weight: 500; letter-spacing: -.04em; }
+.hero-title-static { font-weight: 500; letter-spacing: -.04em; color: #f4eee2; }
+.hero-title-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.2), transparent 65%);
+}
+.hero-title { position: relative; }
