@@ -32,3 +32,32 @@ sh scripts/npm-wsl.sh run build
 Скрипт выбирает Linux Node из установленного nvm, не меняя глобальные настройки.
 Каталог использует API v2 с page/limit/lang/q/rarity/base_color/country_code/letter.
 Сначала обновите и перезапустите API; непагинированный контракт сохранён.
+
+
+### CDN and article covers
+
+Set `VITE_CDN_BASE_URL=https://lithoteka-cdn.storage.yandexcloud.net` for deployment
+and local development. Restart Vite after changing environment variables.
+Mineral paths are resolved centrally by `imageUrl` as
+`{CDN_BASE}/entities/{storage_key}/images/{path}`; storage keys are never slugified.
+Article media URLs (including historical absolute URLs) are used unchanged.
+
+Cards request `/api/v1/posts/{slug}/cover-frames?lang=ru|en` within 200px of the
+viewport. Requests, including empty/error results, are shared per slug/language
+for this page session. Only the poster is loaded initially; hover preloads the
+next frame and advances every 700ms once available, skipping broken frames.
+Leaving the card stops playback and restores the poster. Touch/coarse pointers
+and reduced-motion preferences disable playback. The article page uses the first
+frame statically, falling back to `cover_image`; existing editorial slides remain
+available if neither cover exists. Markdown images retain their supplied URLs.
+
+No hardcoded old bucket URLs for shared site images were found in source/public.
+Existing local shared assets remain unchanged; no unknown object names are assumed.
+
+Manual API verification: inspect catalog thumbnails, mineral hero/gallery and
+fullscreen viewer with a storage_key different from slug; check covers in RU/EN,
+empty sequences, failed URLs, keyboard links, touch and reduced motion. Confirm
+actual common_images object locations before replacing any local assets.
+
+Older Article V2 posts without endpoint frames use their saved media.slides URLs
+in the original order for hover playback. New endpoint frames always take priority.

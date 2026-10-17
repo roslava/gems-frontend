@@ -30,3 +30,13 @@ export function chemicalFormulaGroups(formula) {
   if (current) groups.push(current);
   return groups;
 }
+
+// Format formula tokens inside prose, leaving dates, units and ordinary words alone.
+export function formatChemicalFormulasInText(text) {
+  if (typeof text !== 'string') return text;
+  return text.replace(/[A-Za-z0-9₀-₉()[\],·]+/g, token => {
+    if (!/[A-Z]/.test(token) || !/[0-9]/.test(token)) return token;
+    const rest = token.replace(/[A-Z][a-z]?|[0-9₀-₉()[\],·]|(?<=·)n/g, '');
+    return rest === '' ? formatChemicalFormula(token) : token;
+  });
+}

@@ -24,7 +24,7 @@ export function imageUrl(images, image, cdnBase = import.meta.env?.VITE_CDN_BASE
     const base = new URL(cdnBase);
     if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) return null;
     const prefix = base.href.replace(/\/+$/, '');
-    return `${prefix}/${encodeURIComponent(key)}/${path.split('/').map(encodeURIComponent).join('/')}`;
+    return `${prefix}/entities/${encodeURIComponent(key)}/images/${path.split('/').map(encodeURIComponent).join('/')}`;
   } catch { return null; }
 }
 

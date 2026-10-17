@@ -53,3 +53,7 @@ export function getPost(slug, { lang = 'ru', signal } = {}) {
 export function searchPosts(q, { lang = 'ru', limit = 20, signal } = {}) {
   return request('/search/posts', { q, lang, limit }, { signal });
 }
+
+export function getPostCoverFrames(slug, { lang = 'ru', signal } = {}) {
+  return request(`/posts/${encodeURIComponent(slug)}/cover-frames`, { lang }, { signal });
+}

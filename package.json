@@ -10,6 +10,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.5.0",
     "clsx": "^2.1.1",
     "dompurify": "^3.4.17",
     "marked": "^18.1.1",

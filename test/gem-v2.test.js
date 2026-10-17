@@ -17,7 +17,7 @@ test('V2 list and detail contract rejects malformed payloads', () => {
 
 test('CDN URL uses storage_key and encoded relative path safely', () => {
   const images = { storage_key: 'different_key' };
-  assert.equal(imageUrl(images, { path: 'gallery/specimen 01.webp' }, 'https://cdn.example.org/root///'), 'https://cdn.example.org/root/different_key/gallery/specimen%2001.webp');
+  assert.equal(imageUrl(images, { path: 'gallery/specimen 01.webp' }, 'https://cdn.example.org/root///'), 'https://cdn.example.org/root/entities/different_key/images/gallery/specimen%2001.webp');
   assert.equal(imageUrl(images, { path: '../secret' }, 'https://cdn.example.org'), null);
   assert.equal(imageUrl(images, { path: '/hero.webp' }, 'https://cdn.example.org'), null);
   assert.equal(imageUrl(images, { path: 'different_key/hero.webp' }, 'https://cdn.example.org'), null);

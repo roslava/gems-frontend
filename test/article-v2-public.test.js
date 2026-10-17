@@ -59,8 +59,8 @@ test('shared slide order, localized text, missing caption and no language fallba
   assert.equal(articleTranslation(post.i18n.en).title, 'Why is quartz transparent?');
   assert.equal(articleTranslation({ title: '', excerpt: '', content: '' }), null);
   assert.equal(nextSlideIndex(0, 2, 1), 1);
-  assert.equal(nextSlideIndex(1, 2, 1), 0);
-  assert.equal(nextSlideIndex(0, 2, -1), 1);
+  assert.equal(nextSlideIndex(1, 2, 1), 1);
+  assert.equal(nextSlideIndex(0, 2, -1), 0);
 });
 
 test('Article V2 components render single/multiple slides, card and author', async () => {
@@ -108,11 +108,19 @@ test('Article V2 components render single/multiple slides, card and author', asy
         React.createElement(modules.card.LangProvider, null,
           React.createElement(modules.card.ArticleCard, { post }))),
     );
-    assert.match(card, /slides\/a.webp/);
+    assert.match(card, /legacy.example\/cover.webp/);
+    const legacyCard = renderToStaticMarkup(
+      React.createElement(StaticRouter, { location: '/articles' },
+        React.createElement(modules.card.LangProvider, null,
+          React.createElement(modules.card.ArticleCard, { post: { ...post, cover_image: undefined } }))),
+    );
+    assert.match(legacyCard, /slides\/a.webp/);
+    assert.doesNotMatch(legacyCard, /slides\/b.webp/);
+
     assert.match(card, /Почему кварц прозрачный\?/);
     assert.match(card, /Лид/);
     assert.match(card, /href="\/articles\/question"/);
-    assert.doesNotMatch(card, /legacy.example|Legacy block|slides\/b.webp/);
+    assert.doesNotMatch(card, /Legacy block|slides\/b.webp/);
     const noAvatar = renderToStaticMarkup(React.createElement(modules.page.ArticleAuthor, { name: 'Редакция' }));
     assert.match(noAvatar, /Редакция/);
     assert.doesNotMatch(noAvatar, /<img/);
@@ -122,11 +130,11 @@ test('Article V2 components render single/multiple slides, card and author', asy
     const body = renderToStaticMarkup(React.createElement(modules.page.ArticleBody, {
       post, data: post.i18n.ru, lang: 'ru', contentHtml: '<h2>Ответ</h2><p>Текст</p>',
     }));
-    assert.ok(body.indexOf('article-v2-slider') < body.indexOf('<h1>'));
+    assert.ok(body.indexOf('article-v2-image-frame') < body.indexOf('<h1>'));
     assert.ok(body.indexOf('<h1>') < body.indexOf('article-v2-lead'));
     assert.ok(body.indexOf('article-v2-lead') < body.indexOf('article-v2-content'));
     assert.ok(body.indexOf('article-v2-content') < body.indexOf('article-v2-author'));
-    assert.doesNotMatch(body, /Legacy block|legacy.example|article-tags|gem_slugs/);
+    assert.doesNotMatch(body, /Legacy block|article-tags|gem_slugs/);
     const t = (key) => ({ article_not_found: 'Статья не найдена', back_to_articles: 'К статьям', not_translated: 'Перевода нет', article_load_error: 'Ошибка:' })[key];
     const notFound = renderToStaticMarkup(React.createElement(StaticRouter, { location: '/articles/missing' },
       React.createElement(modules.page.ArticleFeedback, { kind: 'not_found', t })));
@@ -156,8 +164,8 @@ test('Markdown syntax and responsive Article V2 layout are available', async () 
       assert.ok(options.ALLOWED_TAGS.includes('h2'));
       assert.ok(options.ALLOWED_TAGS.includes('a'));
       assert.ok(!options.ALLOWED_TAGS.includes('script'));
-      assert.ok(!options.ALLOWED_TAGS.includes('img'));
-      assert.deepEqual(options.ALLOWED_ATTR, ['href', 'title']);
+      assert.ok(options.ALLOWED_TAGS.includes('img'));
+      assert.deepEqual(options.ALLOWED_ATTR, ['href', 'title', 'src', 'alt']);
       return '<h2>Heading</h2>';
     },
   });

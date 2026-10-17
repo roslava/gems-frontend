@@ -15,5 +15,5 @@ export function slideText(slide, lang) {
 
 export function nextSlideIndex(index, count, direction) {
   if (count < 1) return 0;
-  return (index + direction + count) % count;
+  return Math.max(0, Math.min(count - 1, Math.max(0, Math.min(index, count - 1)) + direction));
 }

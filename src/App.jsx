@@ -1,4 +1,5 @@
-import { Routes, Route, Link, NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { Routes, Route, Link, NavLink, useMatch } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import CatalogPage from './pages/CatalogPage.jsx';
 import MineralPage from './pages/MineralPage.jsx';
@@ -35,13 +36,15 @@ function LangSwitcher() {
 
 export default function App() {
   const { t } = useLang();
+  const entityRoute = useMatch('/minerals/:slug/:section?');
+  const [entityHeaderTarget, setEntityHeaderTarget] = useState(null);
   return (
     <div className="app">
       <header className="site-header">
         <Link to="/" className="logo">
           Лито<span>тека</span>
         </Link>
-        <nav className="site-nav">
+        {entityRoute ? <div className="site-entity-heading" ref={setEntityHeaderTarget} /> : <nav className="site-nav">
           <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : undefined)}>
             {t('nav_home')}
           </NavLink>
@@ -51,7 +54,7 @@ export default function App() {
           <NavLink to="/articles" className={({ isActive }) => (isActive ? 'active' : undefined)}>
             {t('nav_articles')}
           </NavLink>
-        </nav>
+        </nav>}
         <div className="site-header-right">
           <ThemeSwitcher />
           <LangSwitcher />
@@ -61,7 +64,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
-          <Route path="/minerals/:slug" element={<MineralPage />} />
+          <Route path="/minerals/:slug/:section?" element={<MineralPage headerTarget={entityHeaderTarget} />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/articles/:slug" element={<ArticlePage />} />
           <Route path="*" element={<NotFoundPage />} />

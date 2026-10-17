@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import HeroCatalogCount from '../components/HeroCatalogCount.jsx';
 import HeroTitle from '../components/HeroTitle.tsx';
 import { useLang } from '../i18n/LangContext.jsx';
 
@@ -42,6 +43,7 @@ export default function HomePage() {
         fetchpriority={index === 0 ? 'high' : 'low'}
         onLoad={() => { if (index === 1) setSecondReady(true); if (index === 2) setThirdReady(true); if (index === 3) setFourthReady(true); }} />)}
       <HeroTitle paused={paused} />
+      <HeroCatalogCount />
       <div className="home-hero-controls">
         {slides.map((_, index) => <button key={index} type="button"
           className={`home-hero-dot${active === index ? ' active' : ''}`}

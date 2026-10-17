@@ -57,9 +57,13 @@ export default function ArticleSlider({ slides, lang }) {
       </figure>
       {multiple && (
         <div className="article-v2-slider-controls">
-          <button type="button" onClick={() => change(-1)} aria-label={labels.previous}>←</button>
+          <button type="button" onClick={() => change(-1)} aria-label={labels.previous} disabled={activeIndex === 0}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6" /></svg>
+          </button>
           <span aria-live="polite">{activeIndex + 1} / {slides.length}</span>
-          <button type="button" onClick={() => change(1)} aria-label={labels.next}>→</button>
+          <button type="button" onClick={() => change(1)} aria-label={labels.next} disabled={activeIndex === slides.length - 1}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
+          </button>
         </div>
       )}
     </section>
