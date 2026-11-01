@@ -1,15 +1,15 @@
 :root {
   /* === 60 / 30 / 10 — «Разлом» === */
   color-scheme: light;
-  --header-surface: rgba(237, 231, 218, 0.82);
-  --filter-surface: #f0ebdf;
+  --header-surface: rgba(255, 255, 255, 0.92);
+  --filter-surface: #ffffff;
   --skeleton-surface: #e0d8c9;
   --mesh-cream: rgba(251, 248, 242, .9);
   --mesh-sand: rgba(218, 202, 174, .46);
   --mesh-clay: rgba(194, 74, 44, .10);
   --mesh-warm: rgba(230, 195, 159, .32);
-  --base: #ede7da;
-  --base-card: #fbf8f2;
+  --base: #ffffff;
+  --base-card: #ffffff;
   --secondary: #171512;
   --secondary-soft: #2a2521;
   --accent: #c24a2c;
@@ -2222,12 +2222,281 @@ body::before {
 .mineral-catalog-back { display: inline-flex; align-items: center; gap: 6px; }
 .mineral-catalog-back svg { flex-shrink: 0; }
 
-/* Match history illustrations to the 15px / 70ch editorial text column. */
-.mineral-editorial .mineral-history-images { max-width: 70ch; font-size: 15px; }
-.mineral-history-images img { display: block; }
+/* Shared illustration layout for every mineral content section. */
+.mineral-editorial .mineral-section-images { max-width: 70ch; font-size: 15px; }
+.mineral-section-images img { display: block; }
 
-.mineral-history-images { margin-top: 24px; }
-.mineral-history-images .article-v2-slider { margin: 0; }
+.mineral-section-images { margin-top: 24px; }
+.mineral-section-images .article-v2-slider { margin: 0; }
 
-.mineral-history-images .article-v2-image-frame { aspect-ratio: 16 / 9; min-height: 0; }
-.mineral-history-images .article-v2-image-frame img { width: 100%; height: 100%; min-height: 0; object-fit: cover; }
+.mineral-section-images .article-v2-image-frame { aspect-ratio: 16 / 9; min-height: 0; }
+.mineral-section-images .article-v2-image-frame img { width: 100%; height: 100%; min-height: 0; object-fit: cover; }
+
+/* Let entity navigation span the viewport while preserving content widths. */
+.mineral-page.mineral-editorial { max-width: none; width: 100%; }
+.mineral-screen-content.is-overview { max-width: 1536px; margin-inline: auto; }
+
+/* Quiet two-column product details, matching the Basic.Space reference rhythm. */
+.mineral-overview-table-wrap { margin: 0; }
+.mineral-overview-table {
+  width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left;
+  font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.4;
+  letter-spacing: -.01em; color: var(--text-dark);
+}
+.mineral-overview-table th, .mineral-overview-table td {
+  padding: 24px 0; vertical-align: top; overflow-wrap: anywhere;
+}
+.mineral-overview-table tr + tr { border-top: 1px solid var(--border); }
+.mineral-overview-table tbody th { width: 27%; padding-right: 20px; font-weight: 500; }
+.mineral-overview-table tbody td { font-weight: 400; }
+.mineral-overview-table .chemical-formula { font-size: inherit; }
+.mineral-summary .mineral-aliases {
+  font-size: 14px; line-height: 1.4; letter-spacing: -.01em; margin: 0 0 8px;
+}
+.mineral-summary .mineral-details-actions { margin-top: 0; border-top: 1px solid var(--border); padding: 24px 0; align-items: center; gap: 16px 24px; }
+.mineral-summary .mineral-details-actions .btn {
+  min-height: 20px; padding: 0; border: 0; border-radius: 0; background: transparent;
+  justify-content: flex-start; align-items: center; gap: 8px; line-height: 20px;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400;
+  letter-spacing: -.01em; text-decoration: none;
+}
+.mineral-summary .mineral-details-actions .btn:hover { color: var(--accent-dark); }
+@media (max-width: 480px) {
+  .mineral-overview-table th, .mineral-overview-table td { padding-block: 20px; }
+  .mineral-overview-table tbody th { width: 32%; padding-right: 16px; }
+  .mineral-summary .mineral-details-actions .btn { flex: 0 1 auto; }
+}
+
+/* Document scrolling advances the gallery, then releases the whole product stage. */
+.mineral-photo-strip { display: grid; gap: 16px; min-width: 0; align-content: start; }
+.mineral-photo-strip:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.mineral-product-stage[data-pinned] .mineral-intro-grid {
+  position: sticky;
+  top: var(--mineral-stage-top);
+}
+.mineral-product-stage[data-pinned] .mineral-photo-strip {
+  height: var(--mineral-stage-height);
+  overflow: hidden;
+}
+
+/* Related stones appear as quiet tags beneath the product details. */
+.mineral-related-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 16px 0; border-top: 1px solid var(--border);
+}
+.mineral-related-tag {
+  display: inline-flex; align-items: center; padding: 4px 12px;
+  border: 1px solid var(--border); border-radius: 7px; background: transparent;
+  color: var(--text-dark); font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 400; line-height: 1.2; letter-spacing: -.01em;
+  transition: border-color .18s ease, color .18s ease;
+}
+.mineral-related-tag:hover { border-color: var(--text-muted); color: var(--accent-dark); }
+.mineral-related-tag:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Keep the light theme on a clean white canvas. */
+:root:not([data-theme="dark"]) body::before { display: none; }
+
+.mineral-details-action-label { text-decoration: underline; text-underline-offset: 3px; }
+.mineral-details-action-arrow { display: block; flex: 0 0 20px; }
+
+/* Keep the product pinned on every two-column screen, including short windows. */
+.mineral-gallery { min-width: 0; }
+.mineral-product-stage[data-pinned] .mineral-summary {
+  max-height: var(--mineral-stage-height);
+  overflow-y: hidden;
+}
+.mineral-gallery-pagination { display: none; }
+@media (max-width: 720px) {
+  .mineral-photo-strip {
+    display: flex; gap: 16px; overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+  }
+  .mineral-photo-strip::-webkit-scrollbar { display: none; }
+  .mineral-photo-strip .mineral-cover-button {
+    flex: 0 0 100%; min-width: 0; scroll-snap-align: start;
+  }
+  .mineral-gallery-pagination {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
+    padding-top: 8px;
+  }
+  .mineral-gallery-dot {
+    display: grid; place-items: center; width: 28px; height: 28px;
+    padding: 0; border: 0; background: transparent; cursor: pointer;
+  }
+  .mineral-gallery-dot::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--border);
+  }
+  .mineral-gallery-dot[aria-current="true"]::before { background: var(--text-dark); }
+}
+
+/* Mobile appearance and language controls share a settings dropdown. */
+.header-settings { position: relative; }
+.header-settings-trigger, .header-settings-label { display: none; }
+.header-settings-panel { display: flex; align-items: center; gap: 12px; }
+.header-settings-row { display: flex; align-items: center; }
+@media (max-width: 720px) {
+  .header-settings-trigger {
+    display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+    border: 0; border-radius: 6px; background: transparent; color: var(--text-dark); cursor: pointer;
+  }
+  .header-settings-trigger:hover, .header-settings-trigger[aria-expanded="true"] { background: var(--accent-soft); }
+  .header-settings-panel { display: none; }
+  .header-settings-panel[data-open] {
+    display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 110;
+    width: 220px; max-width: calc(100vw - 40px); padding: 12px 16px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--base-card); box-shadow: var(--shadow-soft);
+  }
+  .header-settings-row { justify-content: space-between; gap: 24px; min-height: 40px; }
+  .header-settings-label { display: inline; font-size: 14px; color: var(--text-dark); }
+  .header-settings-panel .lang-switch button { min-width: 36px; min-height: 40px; }
+}
+
+/* Compact mineral navigation lives beside the mobile header controls. */
+.site-brand { display: flex; align-items: center; min-width: 0; }
+.mobile-catalog-back, .entity-mobile-menu-host { display: none; }
+.header-settings { display: flex; align-items: center; }
+@media (max-width: 720px) {
+  .site-header { grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 2px 20px; }
+  .site-brand { grid-column: 1; grid-row: 1; gap: 8px; }
+  .mobile-catalog-back { display: grid; place-items: center; width: 32px; height: 40px; flex-shrink: 0; }
+  .site-header .header-tools { grid-column: 2; grid-row: 1; gap: 4px; }
+  .site-entity-heading { grid-column: 1 / -1; grid-row: 2; min-height: 28px; }
+  .site-entity-heading h1 { font-size: 16px; }
+  .site-header .site-nav { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+  .entity-mobile-menu-host:not(:empty) { display: block; }
+  .mineral-screen-navigation { display: none; }
+  .mineral-product-stage { margin-top: 24px; }
+  .mineral-mobile-menu { position: relative; }
+  .mineral-mobile-menu summary {
+    display: grid; place-items: center; width: 40px; height: 40px;
+    border-radius: 6px; cursor: pointer; list-style: none;
+  }
+  .mineral-mobile-menu summary::-webkit-details-marker { display: none; }
+  .mineral-mobile-menu[open] summary { background: var(--accent-soft); }
+  .mineral-mobile-menu-panel {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 110;
+    display: flex; flex-direction: column; width: 220px; max-width: calc(100vw - 40px);
+    padding: 8px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--base-card); box-shadow: var(--shadow-soft);
+  }
+  .mineral-mobile-menu-panel a { display: flex; align-items: center; min-height: 44px; padding: 10px 12px; font-size: 14px; border-radius: 5px; }
+  .mineral-mobile-menu-panel a:hover, .mineral-mobile-menu-panel a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-dark); }
+}
+
+@media (max-width: 720px) { .site-brand .mobile-catalog-back { order: 1; } }
+
+/* Align the mobile brand and controls on the same vertical center. */
+@media (max-width: 720px) {
+  .site-header { grid-template-rows: minmax(48px, auto) auto; align-items: center; }
+  .site-brand, .site-header .header-tools { min-height: 48px; align-items: center; align-self: center; }
+  .site-brand .logo { display: inline-flex; align-items: center; min-height: 40px; line-height: 24px; }
+  .mobile-catalog-back, .header-settings-trigger, .mineral-mobile-menu summary { height: 40px; display: grid; place-items: center; }
+  .mobile-catalog-back svg, .header-settings-trigger svg, .mineral-mobile-menu summary svg { display: block; }
+}
+
+/* Entity names share the mobile header row and its vertical center. */
+@media (max-width: 720px) {
+  .site-header:has(.site-entity-heading) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(48px, auto);
+    column-gap: 8px;
+  }
+  .site-header .site-entity-heading {
+    grid-column: 2; grid-row: 1; align-self: center; justify-self: stretch;
+    min-height: 40px; text-align: center;
+  }
+  .site-header .site-entity-heading h1 { font-size: 16px; line-height: 20px; }
+  .site-header:has(.site-entity-heading) .header-tools { grid-column: 3; }
+}
+
+.mineral-menu-trigger {
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 6px; background: transparent; color: var(--text-dark); cursor: pointer;
+}
+.mineral-menu-trigger:hover { background: var(--accent-soft); }
+.mineral-section-drawer {
+  position: fixed; inset: 0 auto 0 0; margin: 0;
+  width: min(360px, 88vw); max-width: none; height: 100dvh; max-height: none;
+  padding: 0; border: 0; border-right: 1px solid var(--border);
+  background: var(--base); color: var(--text-dark); overflow-y: auto;
+}
+.mineral-section-drawer[open] { animation: mineral-drawer-enter .24s ease-out; }
+.mineral-section-drawer::backdrop { background: rgba(0,0,0,.35); }
+.mineral-section-drawer-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: max(12px, env(safe-area-inset-top)) 20px 12px; border-bottom: 1px solid var(--border);
+  font: 500 18px/1.4 'Inter', sans-serif;
+}
+.mineral-section-drawer-heading button {
+  display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px;
+  padding: 0; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer;
+}
+.mineral-section-drawer-links { display: flex; flex-direction: column; gap: 8px; padding: 20px 16px max(20px, env(safe-area-inset-bottom)); }
+.mineral-section-drawer-links a {
+  display: flex; align-items: center; min-height: 56px; padding: 16px;
+  border-radius: 8px; font: 400 16px/24px 'Inter', sans-serif;
+}
+.mineral-section-drawer-links a:hover, .mineral-section-drawer-links a[aria-current="page"] {
+  color: var(--accent-dark); background: var(--accent-soft);
+}
+@keyframes mineral-drawer-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .mineral-section-drawer[open] { animation: none; } }
+
+@media (max-width: 720px) {
+  .mineral-section-drawer-heading { height: 53px; min-height: 53px; padding: 4px 20px; }
+}
+
+/* Keep overflowing product information scrollable without a visible scrollbar. */
+.mineral-product-stage[data-pinned] .mineral-summary { scrollbar-width: none; }
+.mineral-product-stage[data-pinned] .mineral-summary::-webkit-scrollbar { display: none; }
+
+/* Clear collection entry and compact filters. */
+
+.hero-introduction { position: relative; text-align: center; max-width: 100%; }
+.hero-description { color: #f4eee2; font-size: clamp(17px, 2vw, 24px); margin: 16px 0 24px; text-wrap: balance; text-shadow: 0 1px 8px #000; }
+.hero-catalog-link { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 48px; padding: 12px 24px; border-radius: 999px; background: #f4eee2; color: #24211d; font-weight: 600; text-decoration: none; }
+.hero-catalog-link:hover { background: #fff; }
+.hero-catalog-link:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+.hero-title-overlay::before { background: radial-gradient(ellipse at center, rgba(0,0,0,.55), transparent 85%); }
+.catalog-inline-filters .catalog-filter-layout { gap: 16px 24px; }
+.catalog-filter-layout .letter-filter > summary { cursor: pointer; min-height: 44px; display: list-item; margin: 0; padding: 12px 0; }
+.letter-filter-selection { color: var(--text-dark); }
+.letter-filter[open] .alphabet-bar { margin-top: 8px; }
+.catalog-inline-filters { padding-top: 16px; padding-bottom: 12px; }
+
+.mineral-overview-title { margin: 0 0 16px; font: 500 clamp(30px, 3vw, 44px)/1.15 'Inter', sans-serif; overflow-wrap: anywhere; }
+.mineral-overview-description { margin: 0 0 24px; font-size: 16px; line-height: 1.65; max-width: 65ch; }
+@media (max-width: 600px) {
+  .hero-title-overlay { padding: 20px; }
+  .hero-description { margin: 12px 0 20px; }
+  .hero-catalog-link { padding: 12px 20px; }
+}
+
+
+/* Keep every gallery photo square with consistent visible spacing. */
+.mineral-photo-strip {
+  grid-auto-rows: max-content;
+  gap: 16px;
+}
+.mineral-photo-strip .mineral-cover-button {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  align-self: start;
+}
+.mineral-photo-strip .mineral-cover {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Long related names wrap within the summary column. */
+.mineral-related-tag { max-width: 100%; min-width: 0; overflow-wrap: anywhere; }
+
+/* Icons align with the first line of each esoteric item, including wrapped text. */
+.mineral-esoteric-item { display: flex; align-items: flex-start; gap: 10px; }
+.mineral-esoteric-icon { display: block; flex: 0 0 24px; width: 24px; height: 24px; object-fit: contain; }

@@ -6,6 +6,7 @@ const STORAGE_KEY = 'samotsvety_lang';
 // не входят — они выбираются хелперами pickI18n()/pickField() ниже прямо из ответа API.
 const STRINGS = {
   ru: {
+    open_catalog: 'Открыть каталог',
     articles_empty: 'Статьи скоро появятся.',
     articles_no_matches: 'По вашему запросу статьи не найдены.',
     articles_language_empty: 'На этом языке пока нет статей.',
@@ -153,6 +154,7 @@ const STRINGS = {
     related_gems_title: 'Связанные камни',
   },
   en: {
+    open_catalog: 'Open catalogue',
     articles_empty: 'Articles are coming soon.',
     articles_no_matches: 'No articles match your search.',
     articles_language_empty: 'No articles are available in this language yet.',

@@ -113,8 +113,8 @@ export default function CatalogPage() {
               ))}
             </div>
           </div>
-          <div className="letter-filter">
-            <span className="color-filter-label" id="letter-filter-label">{t('initial_letter')}</span>
+          <details className="letter-filter">
+            <summary className="color-filter-label" id="letter-filter-label">{t('initial_letter')}{letter && <span className="letter-filter-selection">: {letter}</span>}</summary>
             <div className="alphabet-bar" role="group" aria-labelledby="letter-filter-label">
         <button
           type="button"
@@ -142,7 +142,7 @@ export default function CatalogPage() {
           </button>
         ))}
       </div>
-          </div>
+          </details>
         </div>
   );
 
